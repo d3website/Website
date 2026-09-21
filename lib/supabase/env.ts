@@ -1,0 +1,30 @@
+/**
+ * Centralised access to Supabase environment variables so a missing value
+ * fails loudly with a clear message instead of a vague runtime error.
+ * See .env.local.example for how to populate these.
+ */
+
+function required(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(
+      `Missing environment variable ${name}. Copy .env.local.example to .env.local and fill it in.`,
+    );
+  }
+  return value;
+}
+
+export const supabaseUrl = () =>
+  required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
+
+export const supabaseAnonKey = () =>
+  required(
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+
+/** Server-only. Never import this into a client component. */
+export const supabaseServiceRoleKey = () =>
+  required(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );

@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# D3 Dynamic (d3dynamic.com)
 
-## Getting Started
+Rebuild of the Dynamic Designs Decor furnishing-fabrics website, plus a
+self-serve admin panel for publishing fabric e-catalogues. Single Next.js app,
+Supabase backend.
 
-First, run the development server:
+- **Track 1 — Public site:** rebuild of all pages from d3dynamic.com (`app/(public)/`).
+- **Track 2 — Admin panel:** authenticated catalogue management (`app/admin/`),
+  feeding the dynamic Curtains / Upholstery / Outdoor Fabric pages.
+
+Full plan: [`docs/D3-Dynamic-Website-Project-Plan.md`](docs/D3-Dynamic-Website-Project-Plan.md).
+Homepage hero spec: [`docs/D3-Dynamic-Hero-Component-Spec.md`](docs/D3-Dynamic-Hero-Component-Spec.md).
+
+## Stack
+
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 16 (App Router, React 19) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Database / Auth / Storage | Supabase (Postgres) |
+| Hosting | Vercel (frontend), Supabase (backend) |
+
+> Note: Tailwind v4 is CSS-configured (`app/globals.css`), there is no
+> `tailwind.config.ts`.
+
+## Prerequisites
+
+Node is managed with **nvm** (installed under `~/.nvm`; loader is in `~/.zshrc`).
+A fresh terminal has `node` on the PATH. In a non-login shell, load it first:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This project uses Node 24 LTS.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Getting started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create a Supabase project, then copy env vars:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+   Fill in `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+   `SUPABASE_SERVICE_ROLE_KEY` from Supabase → Project Settings → API.
+3. Apply the schema: run [`supabase/schema.sql`](supabase/schema.sql) in the
+   Supabase SQL editor (creates tables, RLS policies, and storage buckets).
+4. Run the dev server:
+   ```bash
+   npm run dev
+   ```
+   - Public site: http://localhost:3000/
+   - Admin panel: http://localhost:3000/admin
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  (public)/        Public marketing site (Track 1)
+  admin/           Authenticated admin panel (Track 2)
+  layout.tsx       Root layout, fonts, global metadata
+  globals.css      Tailwind v4 + theme tokens
+components/ui/      shadcn components (+ vendored UI like the hero)
+lib/
+  supabase/        Data layer
+    client.ts      Browser client (anon key, RLS)
+    server.ts      Server client (cookie-based auth, RLS)
+    admin.ts       Service-role client (server-only, bypasses RLS)
+    env.ts         Validated env accessors
+    database.types.ts  Typed schema (regenerate from Supabase later)
+supabase/schema.sql   DDL: tables, RLS, storage buckets
+docs/              Project plan & component specs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Build phases
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See the project plan for detail. Current status: **Phase 0 (foundation) complete.**
+Next: Phase 1 (admin panel) — login, taxonomy management, catalogue CRUD, uploads.
