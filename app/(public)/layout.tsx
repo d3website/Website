@@ -1,11 +1,18 @@
 import type { ReactNode } from "react";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 /**
- * Layout shell for the public marketing site (Track 1).
- * Global header/footer and the shared design system land here in Phase 3
- * once the Stitch designs are delivered. Kept minimal for now so Phase 1/2
- * work is not blocked on visual design.
+ * Layout shell for the public marketing site (Track 1). Header + footer wrap
+ * every public page. The full visual design system is applied in the Phase 3
+ * Stitch pass; this is the structural groundwork.
  */
 export default function PublicLayout({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-dvh flex-col">{children}</div>;
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <SiteHeader />
+      <div className="flex flex-1 flex-col">{children}</div>
+      <SiteFooter />
+    </div>
+  );
 }

@@ -103,3 +103,18 @@ create policy "public read thumbnails" on storage.objects
 drop policy if exists "public read catalogues" on storage.objects;
 create policy "public read catalogues" on storage.objects
   for select using (bucket_id = 'catalogues');
+
+-- ---------------------------------------------------------------------------
+-- Contact form submissions (Track 1, Phase 3)
+--   Written server-side via service role; read only by admin. Not public.
+-- ---------------------------------------------------------------------------
+create table if not exists contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  phone text,
+  message text not null,
+  created_at timestamptz default now()
+);
+
+alter table contact_messages enable row level security;

@@ -176,7 +176,11 @@ export function EntryForm({
           <Button type="submit" disabled={pending}>
             {pending ? "Saving…" : isEdit ? "Save changes" : "Save entry"}
           </Button>
-          <Button variant="ghost" render={<Link href="/admin" />}>
+          <Button
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/admin" />}
+          >
             Cancel
           </Button>
         </div>

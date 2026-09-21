@@ -25,7 +25,9 @@ export default async function DashboardPage() {
             {entries.length} {entries.length === 1 ? "entry" : "entries"}
           </p>
         </div>
-        <Button render={<Link href="/admin/catalogue/new" />}>Add entry</Button>
+        <Button nativeButton={false} render={<Link href="/admin/catalogue/new" />}>
+          Add entry
+        </Button>
       </div>
 
       {entries.length === 0 ? (
