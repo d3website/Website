@@ -151,6 +151,45 @@ export interface Database {
         };
         Relationships: [];
       };
+      blog_posts: {
+        Row: {
+          id: string;
+          title: string;
+          slug: string;
+          excerpt: string | null;
+          body: string;
+          cover_image_url: string | null;
+          is_published: boolean;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          slug: string;
+          excerpt?: string | null;
+          body: string;
+          cover_image_url?: string | null;
+          is_published?: boolean;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          slug?: string;
+          excerpt?: string | null;
+          body?: string;
+          cover_image_url?: string | null;
+          is_published?: boolean;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -165,3 +204,4 @@ export type Feature = Database["public"]["Tables"]["features"]["Row"];
 export type DesignType = Database["public"]["Tables"]["design_types"]["Row"];
 export type CatalogueEntry =
   Database["public"]["Tables"]["catalogue_entries"]["Row"];
+export type BlogPost = Database["public"]["Tables"]["blog_posts"]["Row"];

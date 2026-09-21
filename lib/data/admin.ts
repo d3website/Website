@@ -2,6 +2,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
+  BlogPost,
   CatalogueEntry,
   DesignType,
   Feature,
@@ -155,5 +156,83 @@ export async function updateEntry(
 export async function deleteEntry(id: string): Promise<void> {
   const db = createAdminClient();
   const { error } = await db.from("catalogue_entries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+// ---- Blog (admin) ---------------------------------------------------------
+
+export type BlogPostInput = {
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  body: string;
+  cover_image_url: string | null;
+  is_published: boolean;
+  published_at: string | null;
+};
+
+export async function listBlogPosts(): Promise<BlogPost[]> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("blog_posts")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Failed to load posts: ${error.message}`);
+  return data ?? [];
+}
+
+export async function getBlogPost(id: string): Promise<BlogPost | null> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("blog_posts")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Failed to load post: ${error.message}`);
+  return data ?? null;
+}
+
+/** Whether a slug is already taken (optionally excluding one post id). */
+export async function blogSlugTaken(
+  slug: string,
+  excludeId?: string,
+): Promise<boolean> {
+  const db = createAdminClient();
+  let q = db.from("blog_posts").select("id").eq("slug", slug);
+  if (excludeId) q = q.neq("id", excludeId);
+  const { data, error } = await q.maybeSingle();
+  if (error) throw new Error(error.message);
+  return Boolean(data);
+}
+
+export async function insertBlogPost(input: BlogPostInput): Promise<BlogPost> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("blog_posts")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateBlogPost(
+  id: string,
+  input: Partial<BlogPostInput>,
+): Promise<BlogPost> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("blog_posts")
+    .update(input)
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function deleteBlogPost(id: string): Promise<void> {
+  const db = createAdminClient();
+  const { error } = await db.from("blog_posts").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }

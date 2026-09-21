@@ -34,6 +34,7 @@ export function SiteHeader() {
           <NavLink href="/about">About</NavLink>
           <NavDropdown label="Fabrics" items={[...catalogueSections]} />
           <NavDropdown label="Services" items={serviceLinks} />
+          <NavLink href="/blogs">Blog</NavLink>
           <NavLink href="/contact">Contact</NavLink>
         </nav>
 
@@ -62,6 +63,9 @@ export function SiteHeader() {
             </MobileLink>
             <MobileGroup label="Fabrics" items={[...catalogueSections]} onNavigate={() => setOpen(false)} />
             <MobileGroup label="Services" items={serviceLinks} onNavigate={() => setOpen(false)} />
+            <MobileLink href="/blogs" onNavigate={() => setOpen(false)}>
+              Blog
+            </MobileLink>
             <MobileLink href="/contact" onNavigate={() => setOpen(false)}>
               Contact
             </MobileLink>

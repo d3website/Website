@@ -26,6 +26,12 @@ export default async function DashboardLayout({
               Catalogue
             </Link>
             <Link
+              href="/admin/blog"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Blog
+            </Link>
+            <Link
               href="/admin/taxonomy"
               className="text-muted-foreground hover:text-foreground"
             >

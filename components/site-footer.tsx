@@ -11,6 +11,18 @@ export function SiteFooter() {
             {company.legalName} — furnishing fabrics stockist serving the MENA
             region.
           </p>
+          <ul className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
+            <li>
+              <Link href="/about" className="hover:text-foreground">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/blogs" className="hover:text-foreground">
+                Blog
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <div>

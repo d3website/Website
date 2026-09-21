@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const THUMBNAIL_BUCKET = "thumbnails";
 export const CATALOGUE_BUCKET = "catalogues";
+export const BLOG_BUCKET = "blog";
 
 // Size caps (Project Plan §4.5). PDF cap is generous; tune to real files.
 export const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -71,4 +72,17 @@ export async function uploadPdf(
     throw new Error("PDF must be 25 MB or smaller.");
   }
   return uploadTo(CATALOGUE_BUCKET, file, collectionName);
+}
+
+export async function uploadBlogImage(
+  file: File,
+  title: string,
+): Promise<string> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Cover image must be an image file.");
+  }
+  if (file.size > MAX_THUMBNAIL_BYTES) {
+    throw new Error("Cover image must be 5 MB or smaller.");
+  }
+  return uploadTo(BLOG_BUCKET, file, title);
 }

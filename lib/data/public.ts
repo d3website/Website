@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/slug";
-import type { Section } from "@/lib/supabase/database.types";
+import type { BlogPost, Section } from "@/lib/supabase/database.types";
 
 /**
  * Public (site-facing) data access. Uses the RLS-respecting server client, so
@@ -53,4 +53,31 @@ export async function getActiveEntries(
   const { data, error } = await query;
   if (error) throw new Error(`Failed to load entries: ${error.message}`);
   return (data ?? []) as unknown as PublicEntry[];
+}
+
+// ---- Blog (public) --------------------------------------------------------
+
+/** Published posts, newest first. RLS guarantees is_published = true. */
+export async function getPublishedPosts(): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Failed to load posts: ${error.message}`);
+  return data ?? [];
+}
+
+export async function getPublishedPostBySlug(
+  slug: string,
+): Promise<BlogPost | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw new Error(`Failed to load post: ${error.message}`);
+  return data ?? null;
 }
