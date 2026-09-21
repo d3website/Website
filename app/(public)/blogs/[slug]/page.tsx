@@ -49,13 +49,14 @@ export default async function BlogPostPage({
         ← Back to blog
       </Link>
 
-      <header className="mt-6">
-        <p className="text-sm text-muted-foreground">
+      <header className="mt-8">
+        <p className="eyebrow">
           {formatDate(post.published_at ?? post.created_at)}
         </p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="mt-4 text-4xl font-medium leading-tight sm:text-5xl">
           {post.title}
         </h1>
+        <div className="mt-6 h-px w-14 bg-gold" />
       </header>
 
       {post.cover_image_url && (

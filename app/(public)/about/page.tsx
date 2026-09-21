@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { stats } from "@/lib/content";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -20,15 +21,10 @@ const VISION = [
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">
-      <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-        Our Story
-      </p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-        About Dynamic Designs Decor
-      </h1>
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
+      <PageHeader eyebrow="Our Story" title="About Dynamic Designs Decor" />
 
-      <div className="mt-8 flex flex-col gap-5 text-muted-foreground">
+      <div className="mt-10 flex flex-col gap-5 text-lg leading-relaxed text-muted-foreground">
         <p>
           Dynamic Designs Decor is one of the leading brands specializing in
           furnishing fabrics. Founded in 2019 under the banner of Dynamic Fabrics
@@ -54,29 +50,35 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <div className="mt-12 grid grid-cols-2 gap-6 rounded-xl border p-6 sm:grid-cols-4">
+      <div className="mt-14 grid grid-cols-2 gap-8 border-y py-10 sm:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="text-center">
-            <p className="text-2xl font-bold sm:text-3xl">{s.value}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+            <p className="font-serif text-4xl font-medium sm:text-5xl">
+              {s.value}
+            </p>
+            <p className="eyebrow mt-3">{s.label}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-12 grid gap-8 sm:grid-cols-2">
-        <section>
-          <h2 className="text-xl font-semibold">Our Mission</h2>
-          <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-sm text-muted-foreground">
+      <div className="mt-14 grid gap-6 sm:grid-cols-2">
+        <section className="rounded-lg border bg-card p-8">
+          <p className="eyebrow">Our Mission</p>
+          <ul className="mt-5 flex flex-col gap-3 text-muted-foreground">
             {MISSION.map((m) => (
-              <li key={m}>{m}</li>
+              <li key={m} className="border-l-2 border-gold/50 pl-4">
+                {m}
+              </li>
             ))}
           </ul>
         </section>
-        <section>
-          <h2 className="text-xl font-semibold">Our Vision</h2>
-          <ul className="mt-3 flex list-disc flex-col gap-2 pl-5 text-sm text-muted-foreground">
+        <section className="rounded-lg border bg-card p-8">
+          <p className="eyebrow">Our Vision</p>
+          <ul className="mt-5 flex flex-col gap-3 text-muted-foreground">
             {VISION.map((v) => (
-              <li key={v}>{v}</li>
+              <li key={v} className="border-l-2 border-gold/50 pl-4">
+                {v}
+              </li>
             ))}
           </ul>
         </section>

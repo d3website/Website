@@ -5,32 +5,43 @@ import { company, type ServiceContent } from "@/lib/content";
 /** Shared layout for the four Services landing pages (Track 1). */
 export function ServicePageView({ service }: { service: ServiceContent }) {
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <p className="eyebrow">Services</p>
+        <h1 className="mt-4 text-4xl font-medium sm:text-5xl">
           {service.title}
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground">{service.subtitle}</p>
+        <p className="mt-3 font-serif text-xl italic text-muted-foreground">
+          {service.subtitle}
+        </p>
+        <div className="mt-6 h-px w-14 bg-gold" />
       </header>
 
-      <p className="mt-8 text-muted-foreground">{service.intro}</p>
+      <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+        {service.intro}
+      </p>
 
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold">{service.featuresHeading}</h2>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+      <section className="mt-14">
+        <h2 className="text-2xl font-medium">{service.featuresHeading}</h2>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {service.features.map((f) => (
-            <div key={f.title} className="rounded-lg border p-5">
-              <h3 className="font-medium">{f.title}</h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{f.body}</p>
+            <div
+              key={f.title}
+              className="rounded-lg border bg-card p-6 transition-colors hover:border-gold/50"
+            >
+              <h3 className="text-lg font-medium">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {f.body}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="mt-12 flex flex-col items-start gap-4 rounded-xl border bg-muted/30 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <section className="mt-14 flex flex-col items-start gap-5 rounded-xl border bg-muted/40 p-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-semibold">Ready to explore our collections?</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-lg font-medium">Ready to explore our collections?</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Browse our fabrics or get in touch on {company.phone}.
           </p>
         </div>

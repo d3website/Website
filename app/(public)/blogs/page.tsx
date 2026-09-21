@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/data/public";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -22,16 +23,16 @@ export default async function BlogsPage() {
   const posts = await getPublishedPosts();
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-12">
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Blog</h1>
-        <p className="mt-2 max-w-2xl text-muted-foreground">
-          News, guides and inspiration on furnishing fabrics.
-        </p>
-      </header>
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+      <PageHeader
+        eyebrow="Journal"
+        title="Blog"
+        description="News, guides and inspiration on furnishing fabrics."
+        className="mb-12"
+      />
 
       {posts.length === 0 ? (
-        <div className="rounded-lg border border-dashed p-12 text-center text-sm text-muted-foreground">
+        <div className="rounded-lg border border-dashed p-16 text-center text-sm text-muted-foreground">
           No posts yet. Check back soon.
         </div>
       ) : (
@@ -40,7 +41,7 @@ export default async function BlogsPage() {
             <Link
               key={post.id}
               href={`/blogs/${post.slug}`}
-              className="group flex flex-col overflow-hidden rounded-xl border transition-shadow hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-gold/50"
             >
               <div className="relative aspect-[16/9] bg-muted">
                 {post.cover_image_url && (
@@ -54,15 +55,13 @@ export default async function BlogsPage() {
                   />
                 )}
               </div>
-              <div className="flex flex-1 flex-col p-4">
-                <p className="text-xs text-muted-foreground">
+              <div className="flex flex-1 flex-col p-5">
+                <p className="eyebrow">
                   {formatDate(post.published_at ?? post.created_at)}
                 </p>
-                <h2 className="mt-1 font-semibold group-hover:underline">
-                  {post.title}
-                </h2>
+                <h2 className="mt-2 text-xl font-medium">{post.title}</h2>
                 {post.excerpt && (
-                  <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                     {post.excerpt}
                   </p>
                 )}

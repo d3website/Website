@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getActiveEntries, getSectionBySlug, getSections } from "@/lib/data/public";
 import { CatalogueBrowser } from "@/components/catalogue-browser";
+import { PageHeader } from "@/components/page-header";
 
 /**
  * Shared server view for a catalogue page. Pass a section `slug` for a single
@@ -31,13 +32,13 @@ export async function CatalogueSection({
   const entries = await getActiveEntries(sectionId);
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-        {description && (
-          <p className="mt-2 max-w-2xl text-muted-foreground">{description}</p>
-        )}
-      </header>
+    <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-14">
+      <PageHeader
+        eyebrow="Collections"
+        title={title}
+        description={description}
+        className="mb-10"
+      />
 
       <CatalogueBrowser
         sections={sections.map((s) => ({ id: s.id, name: s.name }))}

@@ -46,7 +46,7 @@ export function CatalogueBrowser({
   return (
     <div className="flex flex-col gap-6">
       {/* Section tabs */}
-      <nav className="flex flex-wrap gap-2 border-b pb-3">
+      <nav className="flex flex-wrap gap-x-8 gap-y-2 border-b">
         <TabLink href="/catalogue" active={activeSlug === null}>
           All
         </TabLink>
@@ -113,10 +113,10 @@ function TabLink({
     <Link
       href={href}
       className={cn(
-        "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+        "-mb-px border-b-2 pb-3 text-sm font-medium tracking-wide transition-colors",
         active
-          ? "bg-foreground text-background"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          ? "border-gold text-foreground"
+          : "border-transparent text-muted-foreground hover:text-foreground",
       )}
     >
       {children}
@@ -138,10 +138,10 @@ function Pill({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+        "rounded-full border px-4 py-1.5 text-xs font-medium tracking-wide transition-colors",
         active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+          ? "border-gold bg-gold text-gold-foreground"
+          : "border-border text-muted-foreground hover:border-gold/50 hover:text-foreground",
       )}
     >
       {children}
