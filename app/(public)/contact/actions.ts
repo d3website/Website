@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendContactNotification } from "@/lib/email";
 
 export type ContactState = { ok: boolean; error: string | null };
 
@@ -31,14 +32,11 @@ export async function submitContact(
     return { ok: false, error: "Please enter a valid email address." };
   }
 
+  const record = { name, email, phone: phone || null, message };
+
   try {
     const db = createAdminClient();
-    const { error } = await db.from("contact_messages").insert({
-      name,
-      email,
-      phone: phone || null,
-      message,
-    });
+    const { error } = await db.from("contact_messages").insert(record);
     if (error) throw new Error(error.message);
   } catch {
     return {
@@ -46,6 +44,9 @@ export async function submitContact(
       error: "Sorry, something went wrong. Please try again or email us directly.",
     };
   }
+
+  // Fire off the email notification; never let it fail the submission.
+  await sendContactNotification(record);
 
   return { ok: true, error: null };
 }
