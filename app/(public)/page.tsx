@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import { company, stats } from "@/lib/content";
+import { stats } from "@/lib/content";
+import HomepageHero from "./_components/homepage-hero";
 
 export const metadata: Metadata = {
   title: "Premium Home Decor Fabric Selections",
@@ -25,38 +26,9 @@ const teasers = [
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col">
-      {/*
-        PHASE 3 HERO SLOT.
-        In Phase 3 this band is replaced by the scroll-expansion hero
-        (see docs/D3-Dynamic-Hero-Component-Spec.md → HomepageHero), which
-        needs real hero photography and the Stitch design. Simple band for now.
-      */}
-      <section className="border-b border-border/60 bg-muted/40">
-        <div className="mx-auto flex min-h-[78vh] max-w-4xl flex-col items-center justify-center px-6 py-28 text-center">
-          <p className="eyebrow">{company.legalName}</p>
-          <h1 className="mt-6 max-w-3xl text-5xl font-medium sm:text-6xl md:text-7xl">
-            {company.tagline}
-          </h1>
-          <div className="mt-8 h-px w-16 bg-gold" />
-          <p className="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            A stockist of curtain, upholstery and outdoor furnishing fabrics in
-            the MENA region — with thousands of collections to choose from.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button size="lg" nativeButton={false} render={<Link href="/catalogue" />}>
-              Browse fabrics
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              nativeButton={false}
-              render={<Link href="/about" />}
-            >
-              About D3
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Scroll-expansion hero (docs/D3-Dynamic-Hero-Component-Spec.md).
+          Placeholder media until real hero video/photography is provided. */}
+      <HomepageHero />
 
       {/* Intro / brand blurb */}
       <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
