@@ -36,6 +36,17 @@ Node 24 LTS. There is no Homebrew on this machine.
 
 ## Status
 
-Phase 0 (foundation) done. Phase 1 = admin panel (login, taxonomy CRUD,
-catalogue CRUD, uploads). Public pages (incl. the scroll-expansion hero) are
-Phase 3, blocked on Stitch designs.
+Phases 0–2 done:
+- Phase 0 — foundation (Next/Supabase scaffold, schema, clients).
+- Phase 1 — admin panel: login, taxonomy CRUD, catalogue CRUD, uploads.
+- Phase 2 — dynamic public catalogue pages: `/curtains`, `/upholstery`,
+  `/outdoor-fabric`, `/catalogue` (All), with section-scoped design-type filter
+  pills. Public reads via RLS server client (`lib/data/public.ts`); shared
+  `CatalogueBrowser` + `CatalogueCard`.
+
+Taxonomy seeded via `scripts/seed-taxonomy.mjs` (or `supabase/seed.sql`).
+Real catalogue entries are added through the admin panel (no fabric assets
+seeded yet — Phase 2 migration input still pending from Shevam).
+
+Next — Phase 3: rest of public site + full Stitch design pass (incl. the
+scroll-expansion homepage hero), blocked on Stitch designs.
