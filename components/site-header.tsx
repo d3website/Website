@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { catalogueSections, company, services } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -24,8 +25,18 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="text-lg font-bold tracking-tight">
-          {company.brand}
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image
+            src="/images/d3-crest.png"
+            alt="D3 Dynamic — Dynamic Designs Decor"
+            width={233}
+            height={228}
+            priority
+            className="h-10 w-auto"
+          />
+          <span className="font-serif text-2xl font-semibold tracking-tight">
+            {company.brand}
+          </span>
         </Link>
 
         {/* Desktop nav */}

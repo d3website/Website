@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { catalogueSections, company, offices, services } from "@/lib/content";
 
 export function SiteFooter() {
@@ -6,8 +7,14 @@ export function SiteFooter() {
     <footer className="border-t bg-muted/30">
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-lg font-bold">{company.brand}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <Image
+            src="/images/d3-logo.png"
+            alt={`${company.brand} — ${company.legalName}`}
+            width={498}
+            height={228}
+            className="h-16 w-auto"
+          />
+          <p className="mt-4 text-sm text-muted-foreground">
             {company.legalName} — furnishing fabrics stockist serving the MENA
             region.
           </p>

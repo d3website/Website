@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
  */
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="site-editorial flex min-h-dvh flex-col">
       <SiteHeader />
       <div className="flex flex-1 flex-col">{children}</div>
       <SiteFooter />
