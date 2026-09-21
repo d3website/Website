@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 /**
- * Layout shell for the authenticated admin panel (Track 2).
- *
- * Auth gating (Supabase Auth, single admin role) and the admin chrome
- * (nav, sign-out) are added in Phase 1. The admin panel is intentionally
- * utilitarian and does not depend on the public design system.
+ * Root shell for the admin area (Track 2). Wraps both the login page and the
+ * authenticated dashboard (which has its own nested layout + auth guard under
+ * the (dashboard) route group). Utilitarian by design — no public design deps.
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <div className="min-h-dvh bg-background text-foreground">{children}</div>;
+  return (
+    <div className="min-h-dvh bg-background text-foreground">
+      {children}
+      <Toaster richColors position="top-center" />
+    </div>
+  );
 }
