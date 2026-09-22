@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Button } from "@/components/ui/button";
 import { stats } from "@/lib/content";
 import HomepageHero from "./_components/homepage-hero";
 import HomepageGallery from "./_components/homepage-gallery";
+import HomepageCta from "./_components/homepage-cta";
 
 export const metadata: Metadata = {
   title: "Premium Home Decor Fabric Selections",
@@ -90,21 +90,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Closing CTA */}
-      <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
-        <h2 className="text-3xl font-medium sm:text-4xl">
-          Curtain &amp; upholstery fabrics for every space
-        </h2>
-        <p className="mx-auto mt-6 max-w-2xl leading-relaxed text-muted-foreground">
-          Committed to unparalleled customer service and impeccable quality, and
-          becoming the largest furnishing fabrics company in the world.
-        </p>
-        <div className="mt-10 flex justify-center">
-          <Button size="lg" nativeButton={false} render={<Link href="/contact" />}>
-            Get in touch
-          </Button>
-        </div>
-      </section>
+      {/* Closing CTA — animated rotating-word headline */}
+      <HomepageCta />
     </main>
   );
 }
