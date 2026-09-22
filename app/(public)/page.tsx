@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { stats } from "@/lib/content";
 import HomepageHero from "./_components/homepage-hero";
+import HomepageGallery from "./_components/homepage-gallery";
 
 export const metadata: Metadata = {
   title: "Premium Home Decor Fabric Selections",
@@ -29,6 +30,9 @@ export default function HomePage() {
       {/* Scroll-expansion hero (docs/D3-Dynamic-Hero-Component-Spec.md).
           Placeholder media until real hero video/photography is provided. */}
       <HomepageHero />
+
+      {/* Interactive bento gallery (placeholder media) */}
+      <HomepageGallery />
 
       {/* Intro / brand blurb */}
       <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
