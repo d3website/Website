@@ -23,16 +23,19 @@ export interface Database {
           id: string;
           name: string;
           sort_order: number;
+          hero_image_url: string | null;
         };
         Insert: {
           id?: string;
           name: string;
           sort_order?: number;
+          hero_image_url?: string | null;
         };
         Update: {
           id?: string;
           name?: string;
           sort_order?: number;
+          hero_image_url?: string | null;
         };
         Relationships: [];
       };

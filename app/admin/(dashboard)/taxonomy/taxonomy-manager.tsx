@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addTaxonomy } from "../actions";
+import { SectionsManager, type SectionItem } from "./section-manager";
 
 type Item = { id: string; name: string };
 type Kind = "section" | "feature" | "design_type";
@@ -99,18 +100,15 @@ export function TaxonomyManager({
   features,
   designTypes,
 }: {
-  sections: Item[];
+  sections: SectionItem[];
   features: Item[];
   designTypes: Item[];
 }) {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-      <TaxonomyColumn
-        title="Sections"
-        description="Product types / catalogue pages (Curtains, Upholstery…)."
-        kind="section"
-        initialItems={sections}
-      />
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-3">
+        <SectionsManager initial={sections} />
+      </div>
       <TaxonomyColumn
         title="Design types"
         description="Plain, Textured, Floral, Geometric…"

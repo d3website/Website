@@ -94,6 +94,18 @@ export async function createSection(name: string): Promise<Section> {
   return data;
 }
 
+export async function updateSectionHeroImage(
+  id: string,
+  hero_image_url: string | null,
+): Promise<void> {
+  const db = createAdminClient();
+  const { error } = await db
+    .from("sections")
+    .update({ hero_image_url })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function createFeature(name: string): Promise<Feature> {
   const db = createAdminClient();
   const { data, error } = await db

@@ -8,7 +8,8 @@
 create table if not exists sections (
   id uuid primary key default gen_random_uuid(),
   name text unique not null,
-  sort_order int default 0
+  sort_order int default 0,
+  hero_image_url text
 );
 
 create table if not exists features (
