@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import * as data from "@/lib/data/admin";
-import { uploadPdf, uploadThumbnail } from "@/lib/data/storage";
 
 export type TaxonomyResult =
   | { ok: true; item: { id: string; name: string } }
@@ -66,25 +65,15 @@ export async function saveEntry(
   if (!section_id) return { error: "Section is required." };
   if (!design_type_id) return { error: "Design type is required." };
 
-  const thumbnail = formData.get("thumbnail");
-  const pdf = formData.get("pdf");
-  const hasThumb = thumbnail instanceof File && thumbnail.size > 0;
-  const hasPdf = pdf instanceof File && pdf.size > 0;
+  const thumbnail_url = String(formData.get("thumbnail_url") ?? "").trim();
+  const pdf_url = String(formData.get("pdf_url") ?? "").trim();
 
-  if (!isUpdate && !hasThumb) return { error: "A thumbnail image is required." };
-  if (!isUpdate && !hasPdf) return { error: "A PDF catalogue is required." };
+  if (!isUpdate && !thumbnail_url) {
+    return { error: "A thumbnail image is required." };
+  }
+  if (!isUpdate && !pdf_url) return { error: "A PDF catalogue is required." };
 
   try {
-    let thumbnail_url: string | undefined;
-    let pdf_url: string | undefined;
-
-    if (hasThumb) {
-      thumbnail_url = await uploadThumbnail(thumbnail as File, collection_name);
-    }
-    if (hasPdf) {
-      pdf_url = await uploadPdf(pdf as File, collection_name);
-    }
-
     if (isUpdate) {
       await data.updateEntry(id, {
         collection_name,
@@ -102,8 +91,8 @@ export async function saveEntry(
         design_type_id,
         feature_id,
         is_active,
-        thumbnail_url: thumbnail_url!,
-        pdf_url: pdf_url!,
+        thumbnail_url,
+        pdf_url,
       });
     }
   } catch (e) {

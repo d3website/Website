@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import * as data from "@/lib/data/admin";
-import { uploadThumbnail } from "@/lib/data/storage";
 
 export type ArrivalFormState = { error: string | null };
 
@@ -45,14 +44,10 @@ export async function saveArrival(
       if (!title) return { error: "Title is required." };
       if (!subtitle) return { error: "Subtitle is required." };
 
-      const image = formData.get("image");
-      const hasImage = image instanceof File && image.size > 0;
-      if (!isUpdate && !hasImage) {
+      const image_url = String(formData.get("image_url") ?? "").trim();
+      if (!isUpdate && !image_url) {
         return { error: "An image is required for a new product card." };
       }
-
-      let image_url: string | undefined;
-      if (hasImage) image_url = await uploadThumbnail(image as File, title);
 
       if (isUpdate) {
         await data.updateNewArrival(id, {
@@ -70,7 +65,7 @@ export async function saveArrival(
           entry_id: null,
           title,
           subtitle,
-          image_url: image_url!,
+          image_url,
           sort_order,
           is_active,
         });

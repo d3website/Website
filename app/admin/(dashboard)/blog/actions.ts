@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import * as data from "@/lib/data/admin";
-import { uploadBlogImage } from "@/lib/data/storage";
 import { slugify } from "@/lib/slug";
 
 export type BlogFormState = { error: string | null };
@@ -38,16 +37,11 @@ export async function saveBlogPost(
   if (!title) return { error: "Title is required." };
   if (!body) return { error: "Body is required." };
 
-  const cover = formData.get("cover");
-  const hasCover = cover instanceof File && cover.size > 0;
+  const uploadedCover = String(formData.get("cover_image_url") ?? "").trim();
+  const cover_image_url = uploadedCover || undefined;
 
   try {
     const slug = await uniqueSlug(slugInput || title, isUpdate ? id : undefined);
-
-    let cover_image_url: string | undefined;
-    if (hasCover) {
-      cover_image_url = await uploadBlogImage(cover as File, title);
-    }
 
     if (isUpdate) {
       const existing = await data.getBlogPost(id);

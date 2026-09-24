@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { uploadToStorage } from "@/lib/upload-client";
 import { saveArrival, type ArrivalFormState } from "./actions";
 
 type EntryOption = { id: string; label: string };
@@ -44,9 +45,47 @@ export function ArrivalForm({
   );
   const [entryId, setEntryId] = useState<string>(initial?.entry_id ?? "");
   const [publish, setPublish] = useState<boolean>(initial?.is_active ?? true);
+  const [uploading, setUploading] = useState(false);
+  const [clientError, setClientError] = useState<string | null>(null);
   const [imgPreview, setImgPreview] = useState<string | null>(
     initial?.image_url ?? null,
   );
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setClientError(null);
+    const fd = new FormData(e.currentTarget);
+
+    if (kind === "manual") {
+      const file = fd.get("image");
+      if (file instanceof File && file.size > 0) {
+        if (!file.type.startsWith("image/")) {
+          setClientError("Choose an image.");
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          setClientError("Image must be 5 MB or smaller.");
+          return;
+        }
+        setUploading(true);
+        try {
+          const url = await uploadToStorage(
+            "thumbnails",
+            String(fd.get("title") || "arrival"),
+            file,
+          );
+          fd.set("image_url", url);
+        } catch (err) {
+          setClientError(err instanceof Error ? err.message : "Upload failed.");
+          setUploading(false);
+          return;
+        }
+        setUploading(false);
+      }
+    }
+    fd.delete("image");
+    formAction(fd);
+  }
 
   useEffect(() => {
     return () => {
@@ -61,7 +100,7 @@ export function ArrivalForm({
   }
 
   return (
-    <form action={formAction} className="flex max-w-xl flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex max-w-xl flex-col gap-5">
       {isEdit && <input type="hidden" name="id" value={initial!.id} />}
       <input type="hidden" name="kind" value={kind} />
 
@@ -192,15 +231,21 @@ export function ArrivalForm({
       </label>
       <input type="hidden" name="publish" value={publish ? "true" : "false"} />
 
-      {state.error && (
+      {(clientError || state.error) && (
         <p className="text-sm text-destructive" role="alert">
-          {state.error}
+          {clientError || state.error}
         </p>
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : isEdit ? "Save changes" : "Save arrival"}
+        <Button type="submit" disabled={pending || uploading}>
+          {uploading
+            ? "Uploading…"
+            : pending
+              ? "Saving…"
+              : isEdit
+                ? "Save changes"
+                : "Save arrival"}
         </Button>
         <Button variant="ghost" nativeButton={false} render={<Link href="/admin/arrivals" />}>
           Cancel

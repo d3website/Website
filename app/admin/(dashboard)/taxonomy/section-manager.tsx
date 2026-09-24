@@ -12,8 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { uploadToStorage } from "@/lib/upload-client";
 import { addTaxonomy } from "../actions";
-import { removeSectionHero, setSectionHero } from "./section-actions";
+import { removeSectionHero, setSectionHeroUrl } from "./section-actions";
 
 export type SectionItem = {
   id: string;
@@ -48,18 +49,25 @@ export function SectionsManager({ initial }: { initial: SectionItem[] }) {
   }
 
   function upload(id: string, file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose an image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be 5 MB or smaller.");
+      return;
+    }
     setBusyId(id);
-    const fd = new FormData();
-    fd.set("image", file);
     startTransition(async () => {
-      const r = await setSectionHero(id, fd);
-      if (r.ok) {
+      try {
+        const url = await uploadToStorage("thumbnails", "section-hero", file);
+        await setSectionHeroUrl(id, url);
         setItems((prev) =>
-          prev.map((s) => (s.id === id ? { ...s, hero_image_url: r.url } : s)),
+          prev.map((s) => (s.id === id ? { ...s, hero_image_url: url } : s)),
         );
         toast.success("Banner updated.");
-      } else {
-        toast.error(r.error);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Upload failed.");
       }
       setBusyId(null);
     });

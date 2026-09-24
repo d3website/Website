@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { saveBlogPost, type BlogFormState } from "./actions";
 import { slugify } from "@/lib/slug";
+import { uploadToStorage } from "@/lib/upload-client";
 
 type InitialPost = {
   id: string;
@@ -31,6 +32,8 @@ export function BlogForm({ initial }: { initial?: InitialPost }) {
     initial?.cover_image_url ?? null,
   );
   const [publish, setPublish] = useState(initial?.is_published ?? false);
+  const [uploading, setUploading] = useState(false);
+  const [clientError, setClientError] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -39,6 +42,39 @@ export function BlogForm({ initial }: { initial?: InitialPost }) {
   }, [coverPreview]);
 
   const effectiveSlug = slug.trim() || slugify(title);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setClientError(null);
+    const fd = new FormData(e.currentTarget);
+    const file = fd.get("cover");
+    if (file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/")) {
+        setClientError("Cover must be an image.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setClientError("Cover must be 5 MB or smaller.");
+        return;
+      }
+      setUploading(true);
+      try {
+        const url = await uploadToStorage(
+          "blog",
+          String(fd.get("title") || "post"),
+          file,
+        );
+        fd.set("cover_image_url", url);
+      } catch (err) {
+        setClientError(err instanceof Error ? err.message : "Upload failed.");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+    fd.delete("cover");
+    formAction(fd);
+  }
 
   function onCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -49,7 +85,7 @@ export function BlogForm({ initial }: { initial?: InitialPost }) {
   }
 
   return (
-    <form action={formAction} className="flex max-w-2xl flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-5">
       {isEdit && <input type="hidden" name="id" value={initial!.id} />}
 
       <div className="flex flex-col gap-2">
@@ -140,15 +176,21 @@ export function BlogForm({ initial }: { initial?: InitialPost }) {
       </label>
       <input type="hidden" name="publish" value={publish ? "true" : "false"} />
 
-      {state.error && (
+      {(clientError || state.error) && (
         <p className="text-sm text-destructive" role="alert">
-          {state.error}
+          {clientError || state.error}
         </p>
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : isEdit ? "Save changes" : "Save post"}
+        <Button type="submit" disabled={pending || uploading}>
+          {uploading
+            ? "Uploading…"
+            : pending
+              ? "Saving…"
+              : isEdit
+                ? "Save changes"
+                : "Save post"}
         </Button>
         <Button variant="ghost" nativeButton={false} render={<Link href="/admin/blog" />}>
           Cancel

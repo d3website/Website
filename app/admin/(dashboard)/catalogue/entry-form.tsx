@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { CatalogueCard } from "@/components/catalogue-card";
 import { saveEntry, type EntryFormState } from "../actions";
 import { TaxonomySelect } from "./taxonomy-select";
+import { uploadToStorage } from "@/lib/upload-client";
 import type {
   DesignType,
   Feature,
@@ -49,6 +50,62 @@ export function EntryForm({
   );
   const [pdfName, setPdfName] = useState<string | null>(null);
   const [publish, setPublish] = useState<boolean>(initial?.is_active ?? true);
+  const [uploading, setUploading] = useState(false);
+  const [clientError, setClientError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setClientError(null);
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("collection_name") || "collection");
+
+    const thumb = fd.get("thumbnail");
+    const pdf = fd.get("pdf");
+    const hasThumb = thumb instanceof File && thumb.size > 0;
+    const hasPdf = pdf instanceof File && pdf.size > 0;
+
+    if (hasThumb) {
+      if (!(thumb as File).type.startsWith("image/")) {
+        setClientError("Thumbnail must be an image.");
+        return;
+      }
+      if ((thumb as File).size > 5 * 1024 * 1024) {
+        setClientError("Thumbnail must be 5 MB or smaller.");
+        return;
+      }
+    }
+    if (hasPdf) {
+      if ((pdf as File).type !== "application/pdf") {
+        setClientError("Catalogue must be a PDF.");
+        return;
+      }
+      if ((pdf as File).size > 25 * 1024 * 1024) {
+        setClientError("PDF must be 25 MB or smaller.");
+        return;
+      }
+    }
+
+    setUploading(true);
+    try {
+      if (hasThumb) {
+        fd.set(
+          "thumbnail_url",
+          await uploadToStorage("thumbnails", name, thumb as File),
+        );
+      }
+      if (hasPdf) {
+        fd.set("pdf_url", await uploadToStorage("catalogues", name, pdf as File));
+      }
+    } catch (err) {
+      setClientError(err instanceof Error ? err.message : "Upload failed.");
+      setUploading(false);
+      return;
+    }
+    setUploading(false);
+    fd.delete("thumbnail");
+    fd.delete("pdf");
+    formAction(fd);
+  }
 
   // Revoke object URLs we created for the thumbnail preview.
   useEffect(() => {
@@ -67,7 +124,7 @@ export function EntryForm({
 
   return (
     <form
-      action={formAction}
+      onSubmit={onSubmit}
       className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]"
     >
       {/* ---- Fields ---- */}
@@ -166,15 +223,21 @@ export function EntryForm({
         </label>
         <input type="hidden" name="publish" value={publish ? "true" : "false"} />
 
-        {state.error && (
+        {(clientError || state.error) && (
           <p className="text-sm text-destructive" role="alert">
-            {state.error}
+            {clientError || state.error}
           </p>
         )}
 
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={pending}>
-            {pending ? "Saving…" : isEdit ? "Save changes" : "Save entry"}
+          <Button type="submit" disabled={pending || uploading}>
+            {uploading
+              ? "Uploading…"
+              : pending
+                ? "Saving…"
+                : isEdit
+                  ? "Save changes"
+                  : "Save entry"}
           </Button>
           <Button
             variant="ghost"
