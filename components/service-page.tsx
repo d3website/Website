@@ -7,7 +7,7 @@ export function ServicePageView({ service }: { service: ServiceContent }) {
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16">
       <header>
-        <p className="eyebrow">Services</p>
+        <p className="eyebrow">Features</p>
         <h1 className="mt-4 text-4xl font-medium sm:text-5xl">
           {service.title}
         </h1>

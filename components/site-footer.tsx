@@ -15,8 +15,7 @@ export function SiteFooter() {
             className="h-16 w-auto"
           />
           <p className="mt-4 text-sm text-muted-foreground">
-            {company.legalName} — furnishing fabrics stockist serving the MENA
-            region.
+            Fabrics That Define Beautiful Spaces
           </p>
           <ul className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
             <li>
@@ -46,7 +45,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold">Services</p>
+          <p className="text-sm font-semibold">Features</p>
           <ul className="mt-3 flex flex-col gap-2 text-sm text-muted-foreground">
             {services.map((s) => (
               <li key={s.slug}>
