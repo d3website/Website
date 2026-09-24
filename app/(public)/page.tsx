@@ -3,6 +3,7 @@ import { stats } from "@/lib/content";
 import { getSiteMedia } from "@/lib/data/site-media";
 import { resolveMedia } from "@/lib/media";
 import { FabricCard } from "@/components/ui/fabric-card";
+import { FractalBloomCanvas } from "@/components/ui/fractal-bloom";
 import HomepageHero from "./_components/homepage-hero";
 import HomepageCollection from "./_components/homepage-collection";
 import HomepageGallery from "./_components/homepage-gallery";
@@ -52,22 +53,27 @@ export default async function HomePage() {
 
       <HomepageGallery media={galleryMedia} />
 
-      {/* Intro / brand blurb */}
-      <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
-        <p className="eyebrow">Who we are</p>
-        <h2 className="mt-5 text-3xl font-medium sm:text-4xl">
-          Curators of Distinctive Furnishing Textiles
-        </h2>
-        <p className="mx-auto mt-6 max-w-2xl leading-relaxed text-muted-foreground">
-          D3 crafts premier interior fabrics designed to transform spaces from
-          the ground up. We believe true luxury lies in effortless comfort —
-          merging runway-inspired aesthetics with understated simplicity to
-          create environments that welcome you in.
-        </p>
-        <p className="mx-auto mt-8 max-w-2xl font-serif text-xl italic text-muted-foreground">
-          “An empty room is a story waiting to happen, and you are the author.”
-        </p>
-        <p className="eyebrow mt-3">Charlotte Moss</p>
+      {/* Intro / brand blurb — dark editorial moment with a growing fractal */}
+      <section className="relative isolate overflow-hidden bg-[#1c1917] text-[#f5f0e8]">
+        <FractalBloomCanvas className="absolute inset-0 z-0 h-full w-full" />
+        {/* Vignette so the copy stays legible over the branches */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,rgba(28,25,23,0.35)_0%,rgba(28,25,23,0.75)_65%,rgba(28,25,23,0.95)_100%)]" />
+        <div className="relative z-20 mx-auto w-full max-w-3xl px-6 py-28 text-center sm:py-32">
+          <p className="eyebrow">Who we are</p>
+          <h2 className="mt-5 text-3xl font-medium sm:text-4xl">
+            Curators of Distinctive Furnishing Textiles
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl leading-relaxed text-[#d8cfc2]">
+            D3 crafts premier interior fabrics designed to transform spaces from
+            the ground up. We believe true luxury lies in effortless comfort —
+            merging runway-inspired aesthetics with understated simplicity to
+            create environments that welcome you in.
+          </p>
+          <p className="mx-auto mt-8 max-w-2xl font-serif text-xl italic text-[#c9beac]">
+            “An empty room is a story waiting to happen, and you are the author.”
+          </p>
+          <p className="eyebrow mt-3">Charlotte Moss</p>
+        </div>
       </section>
 
       {/* Product teasers — fabric category cards */}
