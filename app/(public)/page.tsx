@@ -92,7 +92,7 @@ export default async function HomePage() {
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-16 sm:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
-              <p className="font-serif text-4xl font-medium sm:text-5xl">
+              <p className="font-serif text-4xl font-medium tabular-nums lining-nums sm:text-5xl">
                 {s.value}
               </p>
               <p className="eyebrow mt-3">{s.label}</p>

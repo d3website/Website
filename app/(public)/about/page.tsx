@@ -218,7 +218,7 @@ export default async function AboutPage() {
           <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4">
             {stats.map((s) => (
               <div key={s.label}>
-                <p className="font-serif text-4xl font-medium sm:text-5xl">
+                <p className="font-serif text-4xl font-medium tabular-nums lining-nums sm:text-5xl">
                   {s.value}
                 </p>
                 <p className="eyebrow mt-3">{s.label}</p>
