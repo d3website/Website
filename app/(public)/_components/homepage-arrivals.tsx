@@ -1,5 +1,5 @@
 import { getActiveNewArrivals } from "@/lib/data/public";
-import { InteractiveCard } from "@/components/ui/interactive-card";
+import { ArrivalsCarousel } from "@/components/ui/arrivals-carousel";
 
 /**
  * "New Arrivals" homepage section — 3D tilt cards managed from the admin panel.
@@ -19,23 +19,7 @@ export default async function HomepageArrivals() {
         <div className="mx-auto mt-4 h-px w-14 bg-gold" />
       </div>
 
-      <div
-        style={{ perspective: "1200px" }}
-        className="flex flex-wrap justify-center gap-8"
-      >
-        {arrivals.map((a) => (
-          <InteractiveCard
-            key={a.id}
-            title={a.title}
-            subtitle={a.subtitle}
-            imageUrl={a.imageUrl}
-            actionText={a.actionText}
-            actionHref={a.actionHref}
-            actionNewTab={a.actionNewTab}
-            detailHref={a.detailHref}
-          />
-        ))}
-      </div>
+      <ArrivalsCarousel cards={arrivals} />
     </section>
   );
 }
