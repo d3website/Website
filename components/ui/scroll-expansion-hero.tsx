@@ -301,7 +301,7 @@ const ScrollExpandMedia = ({
                   )}
                   {scrollToExpand && (
                     <p
-                      className="text-white/80 font-medium text-center tracking-wide"
+                      className="text-center text-xs font-medium uppercase tracking-[0.25em] text-white/70"
                       style={{ transform: `translateX(${textTranslateX}vw)` }}
                     >
                       {scrollToExpand}
@@ -316,13 +316,13 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-semibold text-white transition-none"
+                  className="text-5xl md:text-6xl lg:text-7xl font-medium text-white transition-none"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center text-white transition-none"
+                  className="text-5xl md:text-6xl lg:text-7xl font-medium text-center text-white transition-none"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}

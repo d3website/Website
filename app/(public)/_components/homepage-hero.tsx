@@ -22,8 +22,8 @@ export default function HomepageHero() {
       mediaSrc="/videos/hero-placeholder.mp4"
       posterSrc="/images/hero/hero-poster.jpg"
       bgImageSrc="/images/hero/hero-background.jpg"
-      title="New Level of Interior"
-      scrollToExpand="Scroll to explore our fabrics"
+      title="Spaces Redefined"
+      scrollToExpand="Explore curated fabrics"
     />
   );
 }
