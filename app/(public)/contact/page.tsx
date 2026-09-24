@@ -49,8 +49,11 @@ export default function ContactPage() {
             <h2 className="text-lg font-semibold">Our offices</h2>
             <div className="mt-3 flex flex-col gap-4 text-sm text-muted-foreground">
               {offices.map((o) => (
-                <div key={o.label}>
-                  <p className="font-medium text-foreground">{o.label}</p>
+                <div key={o.city}>
+                  <p className="font-medium text-foreground">{o.city}</p>
+                  {o.entity && (
+                    <p className="text-foreground/80">{o.entity}</p>
+                  )}
                   {o.lines.map((line) => (
                     <p key={line}>{line}</p>
                   ))}

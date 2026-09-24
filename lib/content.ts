@@ -15,23 +15,53 @@ export const company = {
   instagram: "https://www.instagram.com/d3_dynamicdesignsdecor",
 } as const;
 
-export const offices = [
+export type Office = {
+  city: string;
+  entity?: string;
+  lines: string[];
+};
+
+export const offices: Office[] = [
   {
-    label: "Bhiwandi Office",
+    city: "Dubai",
+    entity: "Dynamic Fabrics FZCO",
     lines: [
-      "Shree Arihant Complex, Arihant Annex Building, 2nd Floor",
-      "Kalher, Bhiwandi, Maharashtra – 421302",
+      "#178, Dubai Textile City, PO Box 4496",
+      "Dubai, United Arab Emirates",
     ],
   },
   {
-    label: "Panipat Office",
-    lines: ["Plot no - 1590 P, Sector-25, Part 2", "Panipat – 132103"],
+    city: "Bahrain",
+    entity: "Dynamic Fabrics W.L.L",
+    lines: [
+      "Shop No. 72, Building 1981, Road 1527",
+      "Block 115, Hidd, Bahrain",
+    ],
   },
   {
-    label: "Headquarters",
-    lines: ["Dubai, United Arab Emirates"],
+    city: "Saudi Arabia",
+    entity: "Almotharek Arabia Trading Company",
+    lines: [
+      "B-10/25, Building No. 3778, Al Sabr Street",
+      "Ash Shulah, Postal Code 34264",
+      "Dammam, Kingdom of Saudi Arabia",
+    ],
   },
-] as const;
+  {
+    city: "Mumbai",
+    entity: "Dynamic Designs Decor LLP",
+    lines: [
+      "2nd Floor, Building Arihant Annex, House No. 888",
+      "Shree Arihant Complex, Kalher",
+      "Bhiwandi (421302), Maharashtra",
+    ],
+  },
+  {
+    city: "Panipat",
+    entity: "Dynamic Designs Decor LLP",
+    lines: ["Plot No. 1590 P, Sector-25, Part 2", "Panipat – 132103"],
+  },
+];
 
 export const stats = [
   { value: "1800+", label: "Satisfied Customers" },
