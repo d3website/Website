@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { stats } from "@/lib/content";
+import { FabricCard } from "@/components/ui/fabric-card";
 import HomepageHero from "./_components/homepage-hero";
 import HomepageGallery from "./_components/homepage-gallery";
 import HomepageCta from "./_components/homepage-cta";
@@ -13,14 +13,25 @@ export const metadata: Metadata = {
 
 const teasers = [
   {
-    title: "Curtain Fabric",
-    body: "Gorgeous jacquards in a symphony of patterns and colours, chosen carefully to match the state of an elegant interior.",
+    title: "Curtains",
+    subtitle: "Jacquards, sheers & elegant drapes",
     href: "/curtains",
+    imageUrl: "/images/teasers/curtains.jpg",
+    themeColor: "26 32% 19%",
   },
   {
-    title: "Upholstery Fabric",
-    body: "Be part of an experience like no other, with our distinctively sophisticated collection of prints, weaves and textures.",
+    title: "Upholstery",
+    subtitle: "Sofa & seating fabrics",
     href: "/upholstery",
+    imageUrl: "/images/teasers/upholstery.jpg",
+    themeColor: "32 24% 24%",
+  },
+  {
+    title: "Outdoor Fabric",
+    subtitle: "Durable, weather-ready textiles",
+    href: "/outdoor-fabric",
+    imageUrl: "/images/teasers/outdoor.jpg",
+    themeColor: "40 30% 24%",
   },
 ];
 
@@ -52,26 +63,16 @@ export default function HomePage() {
         <p className="eyebrow mt-3">Charlotte Moss</p>
       </section>
 
-      {/* Product teasers */}
+      {/* Product teasers — fabric category cards */}
       <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="mb-10 text-center">
+          <p className="eyebrow">Explore</p>
+          <h2 className="mt-4 text-3xl font-medium sm:text-4xl">Our Fabrics</h2>
+          <div className="mx-auto mt-4 h-px w-14 bg-gold" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-3">
           {teasers.map((t) => (
-            <Link
-              key={t.href}
-              href={t.href}
-              className="group rounded-md border bg-card p-10 transition-colors hover:border-gold/60"
-            >
-              <h3 className="text-2xl font-medium">{t.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {t.body}
-              </p>
-              <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-gold">
-                Explore {t.title.toLowerCase()}
-                <span className="transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </span>
-            </Link>
+            <FabricCard key={t.href} {...t} />
           ))}
         </div>
       </section>
