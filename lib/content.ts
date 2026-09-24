@@ -11,8 +11,11 @@ export const company = {
   email: "info@d3dynamic.com",
   phone: "+91 86691 02827",
   phoneHref: "tel:+918669102827",
-  // Social handles from the live footer. URLs to confirm with Shevam.
+  // Social links. Facebook + Pinterest are placeholders until Shevam
+  // provides the page URLs; swap the "#" values then.
   instagram: "https://www.instagram.com/d3_dynamicdesignsdecor",
+  facebook: "#",
+  pinterest: "#",
 } as const;
 
 export type Office = {
