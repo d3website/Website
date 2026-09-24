@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import ScrollExpandMedia from "@/components/ui/scroll-expansion-hero";
-import { Button } from "@/components/ui/button";
 
 /**
  * Homepage scroll-expansion hero (see docs/D3-Dynamic-Hero-Component-Spec.md).
@@ -26,24 +24,6 @@ export default function HomepageHero() {
       bgImageSrc="/images/hero/hero-background.jpg"
       title="New Level of Interior"
       scrollToExpand="Scroll to explore our fabrics"
-    >
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="eyebrow">Dynamic Designs Decor</p>
-        <h2 className="mt-5 text-3xl font-medium sm:text-4xl">
-          Curtain &amp; Upholstery Fabrics
-        </h2>
-        <p className="mx-auto mt-6 max-w-2xl leading-relaxed text-muted-foreground">
-          Choose from thousands of styles of curtain and sofa fabrics for your
-          living room, bedroom, dining room and lounge. A stockist of furnishing
-          fabrics in the MENA region, committed to unparalleled customer service
-          and impeccable quality.
-        </p>
-        <div className="mt-8 flex justify-center">
-          <Button size="lg" nativeButton={false} render={<Link href="/catalogue" />}>
-            Browse fabrics
-          </Button>
-        </div>
-      </div>
-    </ScrollExpandMedia>
+    />
   );
 }

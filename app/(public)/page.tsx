@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { stats } from "@/lib/content";
 import { FabricCard } from "@/components/ui/fabric-card";
 import HomepageHero from "./_components/homepage-hero";
+import HomepageCollection from "./_components/homepage-collection";
 import HomepageGallery from "./_components/homepage-gallery";
 import HomepageCta from "./_components/homepage-cta";
 
@@ -41,6 +42,9 @@ export default function HomePage() {
       {/* Scroll-expansion hero (docs/D3-Dynamic-Hero-Component-Spec.md).
           Placeholder media until real hero video/photography is provided. */}
       <HomepageHero />
+
+      {/* Collection section — animated marquee hero */}
+      <HomepageCollection />
 
       {/* Interactive bento gallery (placeholder media) */}
       <HomepageGallery />
