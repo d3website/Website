@@ -67,10 +67,10 @@ export const offices: Office[] = [
 ];
 
 export const stats = [
-  { value: "1800+", label: "Satisfied Customers" },
-  { value: "4+", label: "Years of Experience" },
-  { value: "3500+", label: "Fabric Collections" },
-  { value: "3+", label: "Offices Worldwide" },
+  { value: "10,000+", label: "Spaces Transformed" },
+  { value: "3500+", label: "Luxury Projects Completed" },
+  { value: "98%", label: "Designer Retention Rate" },
+  { value: "7500+", label: "Homes Elevated" },
 ] as const;
 
 export const catalogueSections = [
