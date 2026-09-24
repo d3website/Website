@@ -15,7 +15,18 @@ import { company } from "@/lib/content";
 export default function HomepageCta() {
   const [index, setIndex] = useState(0);
   const words = useMemo(
-    () => ["space", "room", "home", "style", "moment"],
+    () => [
+      "Vision",
+      "Dimension",
+      "Setting",
+      "Atmosphere",
+      "Interior",
+      "Living Space",
+      "Season of Life",
+      "Mood",
+      "Home",
+      "Style",
+    ],
     [],
   );
 
@@ -33,13 +44,13 @@ export default function HomepageCta() {
           <p className="eyebrow">Get in touch</p>
 
           <h2 className="max-w-3xl text-4xl font-medium leading-[1.05] sm:text-5xl md:text-6xl">
-            <span>Fabrics for every</span>
+            <span>Fabrics for Every</span>
             <span className="relative flex w-full justify-center overflow-hidden pt-1 md:pb-3">
               &nbsp;
               {words.map((word, i) => (
                 <motion.span
                   key={word}
-                  className="absolute font-medium text-gold"
+                  className="absolute whitespace-nowrap font-medium text-gold"
                   initial={{ opacity: 0, y: -100 }}
                   transition={{ type: "spring", stiffness: 50 }}
                   animate={
@@ -55,8 +66,8 @@ export default function HomepageCta() {
           </h2>
 
           <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Committed to unparalleled customer service and impeccable quality —
-            and becoming the largest furnishing fabrics company in the world.
+            Excellence in every thread, distinction in every detail. Shaping the
+            world&rsquo;s finest spaces on a global scale.
           </p>
 
           <div className="flex flex-wrap justify-center gap-3">
