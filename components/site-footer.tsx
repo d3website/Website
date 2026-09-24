@@ -81,15 +81,13 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-6 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
-          {offices.map((o) => (
-            <div key={o.city}>
-              <p className="font-semibold text-foreground">{o.city}</p>
-              {o.entity && <p className="text-foreground/80">{o.entity}</p>}
-              {o.lines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-6 py-5 text-sm text-muted-foreground">
+          <span className="eyebrow">Offices</span>
+          {offices.map((o, i) => (
+            <span key={o.city} className="flex items-center gap-3">
+              {i > 0 && <span className="text-border">·</span>}
+              {o.city}
+            </span>
           ))}
         </div>
       </div>
