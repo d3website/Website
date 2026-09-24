@@ -156,3 +156,33 @@ insert into storage.buckets (id, name, public)
 drop policy if exists "public read blog" on storage.objects;
 create policy "public read blog" on storage.objects
   for select using (bucket_id = 'blog');
+
+-- ---------------------------------------------------------------------------
+-- New Arrivals — homepage featured cards (Track 2)
+-- ---------------------------------------------------------------------------
+create table if not exists new_arrivals (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null default 'catalogue' check (kind in ('catalogue', 'manual')),
+  entry_id uuid references catalogue_entries(id) on delete cascade,
+  title text,
+  subtitle text,
+  image_url text,
+  sort_order int default 0,
+  is_active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists new_arrivals_active_idx
+  on new_arrivals (is_active, sort_order);
+
+drop trigger if exists new_arrivals_set_updated_at on new_arrivals;
+create trigger new_arrivals_set_updated_at
+  before update on new_arrivals
+  for each row execute function set_updated_at();
+
+alter table new_arrivals enable row level security;
+
+drop policy if exists "public read active arrivals" on new_arrivals;
+create policy "public read active arrivals" on new_arrivals
+  for select using (is_active = true);

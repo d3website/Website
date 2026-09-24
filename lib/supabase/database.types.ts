@@ -190,6 +190,52 @@ export interface Database {
         };
         Relationships: [];
       };
+      new_arrivals: {
+        Row: {
+          id: string;
+          kind: string;
+          entry_id: string | null;
+          title: string | null;
+          subtitle: string | null;
+          image_url: string | null;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          kind?: string;
+          entry_id?: string | null;
+          title?: string | null;
+          subtitle?: string | null;
+          image_url?: string | null;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          kind?: string;
+          entry_id?: string | null;
+          title?: string | null;
+          subtitle?: string | null;
+          image_url?: string | null;
+          sort_order?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "new_arrivals_entry_id_fkey";
+            columns: ["entry_id"];
+            referencedRelation: "catalogue_entries";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -205,3 +251,4 @@ export type DesignType = Database["public"]["Tables"]["design_types"]["Row"];
 export type CatalogueEntry =
   Database["public"]["Tables"]["catalogue_entries"]["Row"];
 export type BlogPost = Database["public"]["Tables"]["blog_posts"]["Row"];
+export type NewArrival = Database["public"]["Tables"]["new_arrivals"]["Row"];

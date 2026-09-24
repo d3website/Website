@@ -4,6 +4,7 @@ import { FabricCard } from "@/components/ui/fabric-card";
 import HomepageHero from "./_components/homepage-hero";
 import HomepageCollection from "./_components/homepage-collection";
 import HomepageGallery from "./_components/homepage-gallery";
+import HomepageArrivals from "./_components/homepage-arrivals";
 import HomepageCta from "./_components/homepage-cta";
 
 export const metadata: Metadata = {
@@ -80,6 +81,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* New Arrivals — admin-managed 3D cards (renders when arrivals exist) */}
+      <HomepageArrivals />
 
       {/* Stats bar */}
       <section className="border-y bg-muted/40">

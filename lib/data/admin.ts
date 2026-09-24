@@ -6,6 +6,7 @@ import type {
   CatalogueEntry,
   DesignType,
   Feature,
+  NewArrival,
   Section,
 } from "@/lib/supabase/database.types";
 
@@ -234,5 +235,88 @@ export async function updateBlogPost(
 export async function deleteBlogPost(id: string): Promise<void> {
   const db = createAdminClient();
   const { error } = await db.from("blog_posts").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+// ---- New Arrivals (admin) -------------------------------------------------
+
+export type ArrivalWithEntry = NewArrival & {
+  entry: {
+    id: string;
+    collection_name: string;
+    thumbnail_url: string;
+    pdf_url: string;
+    section: { id: string; name: string } | null;
+  } | null;
+};
+
+const ARRIVAL_SELECT =
+  "*, entry:catalogue_entries(id, collection_name, thumbnail_url, pdf_url, section:sections(id,name))";
+
+export async function listNewArrivals(): Promise<ArrivalWithEntry[]> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("new_arrivals")
+    .select(ARRIVAL_SELECT)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(`Failed to load arrivals: ${error.message}`);
+  return (data ?? []) as unknown as ArrivalWithEntry[];
+}
+
+export async function getNewArrival(
+  id: string,
+): Promise<ArrivalWithEntry | null> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("new_arrivals")
+    .select(ARRIVAL_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return (data as unknown as ArrivalWithEntry) ?? null;
+}
+
+export type NewArrivalInput = {
+  kind: "catalogue" | "manual";
+  entry_id: string | null;
+  title: string | null;
+  subtitle: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export async function insertNewArrival(
+  input: NewArrivalInput,
+): Promise<NewArrival> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("new_arrivals")
+    .insert(input)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateNewArrival(
+  id: string,
+  input: Partial<NewArrivalInput>,
+): Promise<NewArrival> {
+  const db = createAdminClient();
+  const { data, error } = await db
+    .from("new_arrivals")
+    .update(input)
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function deleteNewArrival(id: string): Promise<void> {
+  const db = createAdminClient();
+  const { error } = await db.from("new_arrivals").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }

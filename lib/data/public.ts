@@ -81,3 +81,85 @@ export async function getPublishedPostBySlug(
   if (error) throw new Error(`Failed to load post: ${error.message}`);
   return data ?? null;
 }
+
+// ---- New Arrivals (public) ------------------------------------------------
+
+export type ArrivalCard = {
+  id: string;
+  kind: "catalogue" | "manual";
+  title: string;
+  subtitle: string;
+  imageUrl: string | null;
+  actionText: string;
+  actionHref: string;
+  actionNewTab: boolean;
+  detailHref: string | null;
+};
+
+type RawArrival = {
+  id: string;
+  kind: string;
+  title: string | null;
+  subtitle: string | null;
+  image_url: string | null;
+  entry: {
+    collection_name: string;
+    thumbnail_url: string;
+    pdf_url: string;
+    section: { name: string } | null;
+  } | null;
+};
+
+/**
+ * Active homepage "New Arrivals", resolved into card data. Resilient: returns
+ * [] if the table doesn't exist yet (before the migration is run), so the
+ * homepage never breaks.
+ */
+export async function getActiveNewArrivals(): Promise<ArrivalCard[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("new_arrivals")
+      .select(
+        "id, kind, title, subtitle, image_url, entry:catalogue_entries(collection_name, thumbnail_url, pdf_url, section:sections(name))",
+      )
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) return [];
+
+    const rows = (data ?? []) as unknown as RawArrival[];
+    const cards: ArrivalCard[] = [];
+    for (const r of rows) {
+      if (r.kind === "catalogue") {
+        if (!r.entry) continue; // entry inactive/removed — skip
+        const sectionName = r.entry.section?.name ?? "Fabrics";
+        cards.push({
+          id: r.id,
+          kind: "catalogue",
+          title: r.entry.collection_name,
+          subtitle: sectionName,
+          imageUrl: r.entry.thumbnail_url,
+          actionText: "Download PDF",
+          actionHref: r.entry.pdf_url,
+          actionNewTab: true,
+          detailHref: `/${slugify(sectionName)}`,
+        });
+      } else {
+        cards.push({
+          id: r.id,
+          kind: "manual",
+          title: r.title ?? "New Collection",
+          subtitle: r.subtitle ?? "",
+          imageUrl: r.image_url,
+          actionText: "Contact us",
+          actionHref: "/contact",
+          actionNewTab: false,
+          detailHref: null,
+        });
+      }
+    }
+    return cards;
+  } catch {
+    return [];
+  }
+}
