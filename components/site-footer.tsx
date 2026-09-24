@@ -81,11 +81,11 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-6 py-5 text-sm text-muted-foreground">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-2 px-6 py-5 text-sm text-muted-foreground">
           <span className="eyebrow">Offices</span>
           {offices.map((o, i) => (
-            <span key={o.city} className="flex items-center gap-3">
-              {i > 0 && <span className="text-border">·</span>}
+            <span key={o.city} className="flex items-center gap-6">
+              {i > 0 && <span className="text-border/70">·</span>}
               {o.city}
             </span>
           ))}
