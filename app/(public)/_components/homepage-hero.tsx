@@ -1,27 +1,28 @@
 "use client";
 
 import ScrollExpandMedia from "@/components/ui/scroll-expansion-hero";
+import type { MediaType } from "@/lib/media";
 
 /**
  * Homepage scroll-expansion hero (see docs/D3-Dynamic-Hero-Component-Spec.md).
- *
- * On load, a background photo fills the screen with the title. As the visitor
- * scrolls, the centered media grows until it fills the viewport, then the page
- * unlocks and reveals the content below. This is a deliberate, distinctive
- * interaction (scroll is locked until the media fully expands) — not a bug.
- *
- * PLACEHOLDER MEDIA: /public/videos/hero-placeholder.mp4 and the hero images
- * under /public/images/hero/ are generated placeholders. Drop the real hero
- * video in at /public/videos/hero-placeholder.mp4 (and real photography for the
- * background/poster) to go live — no code change needed.
+ * Background + foreground media are admin-managed (Manage Media → Homepage —
+ * Hero); the foreground can be an image or a video.
  */
-export default function HomepageHero() {
+export default function HomepageHero({
+  background,
+  media,
+  mediaType,
+}: {
+  background: string;
+  media: string;
+  mediaType: MediaType;
+}) {
   return (
     <ScrollExpandMedia
-      mediaType="video"
-      mediaSrc="/videos/hero-placeholder.mp4"
-      posterSrc="/images/hero/hero-poster.jpg"
-      bgImageSrc="/images/hero/hero-background.jpg"
+      mediaType={mediaType}
+      mediaSrc={media}
+      posterSrc={background}
+      bgImageSrc={background}
       title="Spaces Redefined"
       scrollToExpand="Explore curated fabrics"
     />

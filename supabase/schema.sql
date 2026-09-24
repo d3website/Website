@@ -187,3 +187,27 @@ alter table new_arrivals enable row level security;
 drop policy if exists "public read active arrivals" on new_arrivals;
 create policy "public read active arrivals" on new_arrivals
   for select using (is_active = true);
+
+-- ---------------------------------------------------------------------------
+-- Site media — admin-managed image/video placeholders (Track 2)
+-- ---------------------------------------------------------------------------
+create table if not exists site_media (
+  slot text primary key,
+  url text not null,
+  media_type text not null default 'image' check (media_type in ('image', 'video')),
+  updated_at timestamptz default now()
+);
+
+alter table site_media enable row level security;
+
+drop policy if exists "public read site media" on site_media;
+create policy "public read site media" on site_media
+  for select using (true);
+
+insert into storage.buckets (id, name, public)
+  values ('media', 'media', true)
+  on conflict (id) do nothing;
+
+drop policy if exists "public read site media bucket" on storage.objects;
+create policy "public read site media bucket" on storage.objects
+  for select using (bucket_id = 'media');

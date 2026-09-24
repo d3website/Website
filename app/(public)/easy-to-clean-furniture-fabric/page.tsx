@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 
@@ -48,7 +50,11 @@ const features = [
   },
 ];
 
-export default function EasyToCleanPage() {
+export default async function EasyToCleanPage() {
+  const media = await getSiteMedia();
+  const heroImg = resolveMedia(media, "feature.easy-to-clean.hero").url;
+  const introImg = resolveMedia(media, "feature.easy-to-clean.intro").url;
+
   return (
     <main className="flex-1">
       {/* Header */}
@@ -64,7 +70,7 @@ export default function EasyToCleanPage() {
       <section className="mx-auto mt-10 w-full max-w-6xl px-6">
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/images/features/easy-clean-hero.jpg"
+            src={heroImg}
             alt="Easy-to-clean furniture fabrics"
             fill
             sizes="(max-width: 1152px) 100vw, 1152px"
@@ -80,7 +86,7 @@ export default function EasyToCleanPage() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
             <Image
-              src="/images/features/easy-clean-life.jpg"
+              src={introImg}
               alt="Furniture made to be lived in"
               fill
               sizes="(max-width: 768px) 100vw, 560px"

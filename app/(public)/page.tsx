@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { stats } from "@/lib/content";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { FabricCard } from "@/components/ui/fabric-card";
 import HomepageHero from "./_components/homepage-hero";
 import HomepageCollection from "./_components/homepage-collection";
@@ -13,42 +15,42 @@ export const metadata: Metadata = {
     "Dynamic Designs Decor (D3) — a leading stockist of curtain, upholstery and outdoor furnishing fabrics in the MENA region, with thousands of collections.",
 };
 
-const teasers = [
-  {
-    title: "Curtains",
-    subtitle: "Jacquards, sheers & elegant drapes",
-    href: "/curtains",
-    imageUrl: "/images/teasers/curtains.jpg",
-    themeColor: "26 32% 19%",
-  },
-  {
-    title: "Upholstery",
-    subtitle: "Sofa & seating fabrics",
-    href: "/upholstery",
-    imageUrl: "/images/teasers/upholstery.jpg",
-    themeColor: "32 24% 24%",
-  },
-  {
-    title: "Outdoor Fabric",
-    subtitle: "Durable, weather-ready textiles",
-    href: "/outdoor-fabric",
-    imageUrl: "/images/teasers/outdoor.jpg",
-    themeColor: "40 30% 24%",
-  },
+const teaserMeta = [
+  { title: "Curtains", subtitle: "Jacquards, sheers & elegant drapes", href: "/curtains", slot: "home.fabric.curtains", themeColor: "26 32% 19%" },
+  { title: "Upholstery", subtitle: "Sofa & seating fabrics", href: "/upholstery", slot: "home.fabric.upholstery", themeColor: "32 24% 24%" },
+  { title: "Outdoor Fabric", subtitle: "Durable, weather-ready textiles", href: "/outdoor-fabric", slot: "home.fabric.outdoor", themeColor: "40 30% 24%" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const media = await getSiteMedia();
+
+  const heroBg = resolveMedia(media, "home.hero.background").url;
+  const heroMedia = resolveMedia(media, "home.hero.media");
+
+  const marqueeImages = Array.from({ length: 12 }, (_, i) =>
+    resolveMedia(media, `home.marquee.${i + 1}`).url,
+  ).filter(Boolean);
+
+  const galleryMedia = Array.from({ length: 6 }, (_, i) =>
+    resolveMedia(media, `home.gallery.${i + 1}`),
+  );
+
+  const teasers = teaserMeta.map((t) => ({
+    ...t,
+    imageUrl: resolveMedia(media, t.slot).url,
+  }));
+
   return (
     <main className="flex flex-1 flex-col">
-      {/* Scroll-expansion hero (docs/D3-Dynamic-Hero-Component-Spec.md).
-          Placeholder media until real hero video/photography is provided. */}
-      <HomepageHero />
+      <HomepageHero
+        background={heroBg}
+        media={heroMedia.url}
+        mediaType={heroMedia.type}
+      />
 
-      {/* Collection section — animated marquee hero */}
-      <HomepageCollection />
+      <HomepageCollection images={marqueeImages} />
 
-      {/* Interactive bento gallery (placeholder media) */}
-      <HomepageGallery />
+      <HomepageGallery media={galleryMedia} />
 
       {/* Intro / brand blurb */}
       <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">

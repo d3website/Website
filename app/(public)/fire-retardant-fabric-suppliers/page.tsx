@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { company } from "@/lib/content";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 
@@ -42,7 +44,11 @@ const features = [
   },
 ];
 
-export default function FireRetardantPage() {
+export default async function FireRetardantPage() {
+  const media = await getSiteMedia();
+  const heroImg = resolveMedia(media, "feature.fire-retardant.hero").url;
+  const introImg = resolveMedia(media, "feature.fire-retardant.intro").url;
+
   return (
     <main className="flex-1">
       {/* Header */}
@@ -58,7 +64,7 @@ export default function FireRetardantPage() {
       <section className="mx-auto mt-10 w-full max-w-6xl px-6">
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/images/features/fire-retardant-hero.jpg"
+            src={heroImg}
             alt="Fire retardant furnishing fabrics"
             fill
             sizes="(max-width: 1152px) 100vw, 1152px"
@@ -97,7 +103,7 @@ export default function FireRetardantPage() {
           </div>
           <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted md:order-first">
             <Image
-              src="/images/features/fire-retardant-space.jpg"
+              src={introImg}
               alt="A considered contract interior"
               fill
               sizes="(max-width: 768px) 100vw, 560px"

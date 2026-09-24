@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { company } from "@/lib/content";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 
@@ -34,7 +36,11 @@ const features = [
   },
 ];
 
-export default function PetFriendlyPage() {
+export default async function PetFriendlyPage() {
+  const media = await getSiteMedia();
+  const heroImg = resolveMedia(media, "feature.pet-friendly.hero").url;
+  const introImg = resolveMedia(media, "feature.pet-friendly.intro").url;
+
   return (
     <main className="flex-1">
       {/* Header */}
@@ -50,7 +56,7 @@ export default function PetFriendlyPage() {
       <section className="mx-auto mt-10 w-full max-w-6xl px-6">
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/images/features/pet-friendly-hero.jpg"
+            src={heroImg}
             alt="Pet-friendly upholstery fabrics"
             fill
             sizes="(max-width: 1152px) 100vw, 1152px"
@@ -66,7 +72,7 @@ export default function PetFriendlyPage() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
             <Image
-              src="/images/features/pet-friendly-life.jpg"
+              src={introImg}
               alt="A home lived in with pets"
               fill
               sizes="(max-width: 768px) 100vw, 560px"

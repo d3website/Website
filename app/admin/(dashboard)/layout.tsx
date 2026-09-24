@@ -38,6 +38,12 @@ export default async function DashboardLayout({
               Arrivals
             </Link>
             <Link
+              href="/admin/media"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Media
+            </Link>
+            <Link
               href="/admin/taxonomy"
               className="text-muted-foreground hover:text-foreground"
             >

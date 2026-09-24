@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { stats } from "@/lib/content";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
@@ -9,21 +11,21 @@ export const metadata: Metadata = {
     "About Dynamic Designs Decor (D3) — a premium furnishing-fabric brand founded in Dubai in 2019, curating curtain, upholstery and outdoor fabrics for beautifully considered spaces.",
 };
 
-const collections = [
+const collectionMeta = [
   {
     title: "Curtain Fabrics",
     body: "Elegant sheers, sophisticated drapes and statement textiles designed to frame a space beautifully.",
-    image: "/images/teasers/curtains.jpg",
+    slot: "about.collection.curtains",
   },
   {
     title: "Upholstery Fabrics",
     body: "Rich textures, refined patterns and durable constructions created to bring character and comfort to furniture.",
-    image: "/images/teasers/upholstery.jpg",
+    slot: "about.collection.upholstery",
   },
   {
     title: "Outdoor Fabrics",
     body: "Beautiful, functional textiles designed to extend sophisticated interiors into outdoor living spaces.",
-    image: "/images/teasers/outdoor.jpg",
+    slot: "about.collection.outdoor",
   },
 ];
 
@@ -31,7 +33,15 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="eyebrow">{children}</p>;
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const media = await getSiteMedia();
+  const heroImg = resolveMedia(media, "about.hero").url;
+  const philosophyImg = resolveMedia(media, "about.philosophy").url;
+  const collections = collectionMeta.map((c) => ({
+    ...c,
+    image: resolveMedia(media, c.slot).url,
+  }));
+
   return (
     <main className="flex-1">
       {/* Header */}
@@ -47,7 +57,7 @@ export default function AboutPage() {
       <section className="mx-auto mt-10 w-full max-w-6xl px-6">
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/images/about/about-hero.jpg"
+            src={heroImg}
             alt="D3 furnishing fabrics"
             fill
             sizes="(max-width: 1152px) 100vw, 1152px"
@@ -106,7 +116,7 @@ export default function AboutPage() {
         <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2 lg:py-20">
           <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
             <Image
-              src="/images/about/about-philosophy.jpg"
+              src={philosophyImg}
               alt="Considered fabrics and finishes"
               fill
               sizes="(max-width: 768px) 100vw, 560px"

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { getSiteMedia } from "@/lib/data/site-media";
+import { resolveMedia } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 
@@ -48,7 +50,11 @@ const features = [
   },
 ];
 
-export default function LeatherFinishPage() {
+export default async function LeatherFinishPage() {
+  const media = await getSiteMedia();
+  const heroImg = resolveMedia(media, "feature.leather-finish.hero").url;
+  const introImg = resolveMedia(media, "feature.leather-finish.intro").url;
+
   return (
     <main className="flex-1">
       {/* Header */}
@@ -64,7 +70,7 @@ export default function LeatherFinishPage() {
       <section className="mx-auto mt-10 w-full max-w-6xl px-6">
         <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/images/features/leather-finish-hero.jpg"
+            src={heroImg}
             alt="Leather finish sofa cloth"
             fill
             sizes="(max-width: 1152px) 100vw, 1152px"
@@ -103,7 +109,7 @@ export default function LeatherFinishPage() {
           </div>
           <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted md:order-first">
             <Image
-              src="/images/features/leather-finish-detail.jpg"
+              src={introImg}
               alt="Rich leather-look upholstery texture"
               fill
               sizes="(max-width: 768px) 100vw, 560px"

@@ -239,6 +239,27 @@ export interface Database {
           },
         ];
       };
+      site_media: {
+        Row: {
+          slot: string;
+          url: string;
+          media_type: string;
+          updated_at: string;
+        };
+        Insert: {
+          slot: string;
+          url: string;
+          media_type?: string;
+          updated_at?: string;
+        };
+        Update: {
+          slot?: string;
+          url?: string;
+          media_type?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

@@ -5,6 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const THUMBNAIL_BUCKET = "thumbnails";
 export const CATALOGUE_BUCKET = "catalogues";
 export const BLOG_BUCKET = "blog";
+export const MEDIA_BUCKET = "media";
+
+export const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB
 
 // Size caps (Project Plan §4.5). PDF cap is generous; tune to real files.
 export const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -85,4 +88,27 @@ export async function uploadBlogImage(
     throw new Error("Cover image must be 5 MB or smaller.");
   }
   return uploadTo(BLOG_BUCKET, file, title);
+}
+
+/**
+ * Uploads a site-media file (image or video) for a managed slot. Returns the
+ * public URL and the detected media type.
+ */
+export async function uploadSiteMedia(
+  file: File,
+  slotKey: string,
+): Promise<{ url: string; type: "image" | "video" }> {
+  const isImage = file.type.startsWith("image/");
+  const isVideo = file.type.startsWith("video/");
+  if (!isImage && !isVideo) {
+    throw new Error("File must be an image or a video.");
+  }
+  if (isImage && file.size > MAX_THUMBNAIL_BYTES) {
+    throw new Error("Image must be 5 MB or smaller.");
+  }
+  if (isVideo && file.size > MAX_VIDEO_BYTES) {
+    throw new Error("Video must be 50 MB or smaller.");
+  }
+  const url = await uploadTo(MEDIA_BUCKET, file, slotKey.replace(/\./g, "-"));
+  return { url, type: isVideo ? "video" : "image" };
 }
