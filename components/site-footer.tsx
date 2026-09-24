@@ -8,9 +8,9 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Image
-            src="/images/d3-logo.png"
+            src="/images/d3-lockup.png"
             alt={`${company.brand} — ${company.legalName}`}
-            width={498}
+            width={464}
             height={228}
             className="h-16 w-auto"
           />
