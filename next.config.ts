@@ -15,6 +15,12 @@ const legacyPaths = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Raise the Server Action body limit (default 1 MB) so smaller admin
+    // uploads work. Large files (hero video, catalogue PDFs) upload directly
+    // to Supabase Storage from the browser, bypassing this limit entirely.
+    serverActions: { bodySizeLimit: "30mb" },
+  },
   images: {
     remotePatterns: [
       // Supabase Storage public URLs (catalogue thumbnails, blog covers).

@@ -14,11 +14,14 @@ import {
 } from "@/components/ui/card";
 import {
   MEDIA_GROUPS,
+  MEDIA_SIZE_LIMITS,
+  MEDIA_SLOTS,
   resolveMedia,
   type MediaMap,
   type MediaSlotDef,
 } from "@/lib/media";
-import { resetMediaSlot, uploadMediaSlot } from "./actions";
+import { uploadToStorage } from "@/lib/upload-client";
+import { resetMediaSlot, setMediaSlot } from "./actions";
 
 const acceptAttr = (accept: MediaSlotDef["accept"]) =>
   accept === "image"
@@ -34,16 +37,44 @@ export function MediaManager({ media }: { media: MediaMap }) {
   const inputs = useRef<Record<string, HTMLInputElement | null>>({});
 
   function upload(slot: string, file: File) {
+    const def = MEDIA_SLOTS[slot];
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+    if (!isImage && !isVideo) {
+      toast.error("Choose an image or a video.");
+      return;
+    }
+    if (def.accept === "image" && !isImage) {
+      toast.error("This slot accepts images only.");
+      return;
+    }
+    if (def.accept === "video" && !isVideo) {
+      toast.error("This slot accepts videos only.");
+      return;
+    }
+    const type: "image" | "video" = isVideo ? "video" : "image";
+    if (file.size > MEDIA_SIZE_LIMITS[type]) {
+      toast.error(
+        type === "video"
+          ? "Video must be 50 MB or smaller."
+          : "Image must be 5 MB or smaller.",
+      );
+      return;
+    }
+
     setBusy(slot);
-    const fd = new FormData();
-    fd.set("file", file);
     startTransition(async () => {
-      const r = await uploadMediaSlot(slot, fd);
-      if (r.ok) {
-        setMap((m) => ({ ...m, [slot]: { url: r.url, type: r.type } }));
-        toast.success("Media updated.");
-      } else {
-        toast.error(r.error);
+      try {
+        const url = await uploadToStorage("media", slot, file);
+        const r = await setMediaSlot(slot, url, type);
+        if (r.ok) {
+          setMap((m) => ({ ...m, [slot]: { url: r.url, type: r.type } }));
+          toast.success("Media updated.");
+        } else {
+          toast.error(r.error);
+        }
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Upload failed.");
       }
       setBusy(null);
     });

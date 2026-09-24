@@ -11,6 +11,12 @@
 export type MediaType = "image" | "video";
 export type MediaAccept = MediaType | "both";
 
+/** Client-side upload size caps (bytes). Mirror lib/data/storage.ts. */
+export const MEDIA_SIZE_LIMITS = {
+  image: 5 * 1024 * 1024, // 5 MB
+  video: 50 * 1024 * 1024, // 50 MB
+};
+
 export interface MediaSlotDef {
   key: string;
   label: string;
