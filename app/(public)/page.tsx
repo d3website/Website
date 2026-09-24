@@ -53,16 +53,16 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
         <p className="eyebrow">Who we are</p>
         <h2 className="mt-5 text-3xl font-medium sm:text-4xl">
-          Best specializing in furnishing materials
+          Curators of Distinctive Furnishing Textiles
         </h2>
         <p className="mx-auto mt-6 max-w-2xl leading-relaxed text-muted-foreground">
-          Founded in Dubai in 2019 and present in India since 2021, “D3” is one
-          of the top brands specializing in furnishing materials. Our goal is to
-          have our products inspire comfort — to make you feel at home wherever
-          you are, with the newest blend of fashion trends and simplicity.
+          D3 crafts premier interior fabrics designed to transform spaces from
+          the ground up. We believe true luxury lies in effortless comfort —
+          merging runway-inspired aesthetics with understated simplicity to
+          create environments that welcome you in.
         </p>
         <p className="mx-auto mt-8 max-w-2xl font-serif text-xl italic text-muted-foreground">
-          “An empty home is a story waiting to happen and you are the author.”
+          “An empty room is a story waiting to happen, and you are the author.”
         </p>
         <p className="eyebrow mt-3">Charlotte Moss</p>
       </section>
