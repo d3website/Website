@@ -111,6 +111,20 @@ const ScrollExpandMedia = ({
 
     const handleTouchEnd = (): void => {
       setTouchStartY(0);
+      // Snap on release so a normal flick commits instead of leaving the
+      // hero stranded mid-expansion (which blocks the page from scrolling).
+      // Momentum scrolling is suppressed while expanding, so without this a
+      // partial swipe locks the viewport at the hero on touch devices.
+      if (!mediaFullyExpanded) {
+        if (scrollProgress >= 0.2) {
+          setScrollProgress(1);
+          setMediaFullyExpanded(true);
+          setShowContent(true);
+        } else if (scrollProgress > 0) {
+          setScrollProgress(0);
+          setShowContent(false);
+        }
+      }
     };
 
     const handleScroll = (): void => {
