@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-  TouchEvent,
-  WheelEvent,
-} from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -36,136 +29,41 @@ const ScrollExpandMedia = ({
 }: ScrollExpandMediaProps) => {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [showContent, setShowContent] = useState<boolean>(false);
-  const [mediaFullyExpanded, setMediaFullyExpanded] = useState<boolean>(false);
-  const [touchStartY, setTouchStartY] = useState<number>(0);
   const [isMobileState, setIsMobileState] = useState<boolean>(false);
 
-  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
 
+  // Native, scroll-driven expansion. A tall "track" wraps a sticky hero; the
+  // hero grows as you scroll into the track, then unpins so the page continues
+  // normally. No scroll hijacking (no preventDefault / scrollTo), so touch and
+  // wheel both stay smooth in either direction and never lock.
   useEffect(() => {
-    // Reset the interaction when the media type changes (vendored spec behavior).
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setScrollProgress(0);
-    setShowContent(false);
-    setMediaFullyExpanded(false);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [mediaType]);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
-        e.preventDefault();
-        const scrollDelta = e.deltaY * 0.0009;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1,
-        );
-        setScrollProgress(newProgress);
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
-          setShowContent(false);
-        }
-      }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const track = trackRef.current;
+      if (!track) return;
+      const distance = track.offsetHeight - window.innerHeight;
+      const scrolled = Math.min(
+        Math.max(-track.getBoundingClientRect().top, 0),
+        Math.max(distance, 1),
+      );
+      const p = distance > 0 ? scrolled / distance : 0;
+      setScrollProgress(p);
+      setShowContent(p >= 0.75);
     };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      setTouchStartY(e.touches[0].clientY);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
     };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!touchStartY) return;
-
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY;
-
-      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
-        setMediaFullyExpanded(false);
-        e.preventDefault();
-      } else if (!mediaFullyExpanded) {
-        e.preventDefault();
-        // Increase sensitivity for mobile, especially when scrolling back
-        const scrollFactor = deltaY < 0 ? 0.008 : 0.005; // Higher sensitivity for scrolling back
-        const scrollDelta = deltaY * scrollFactor;
-        const newProgress = Math.min(
-          Math.max(scrollProgress + scrollDelta, 0),
-          1,
-        );
-        setScrollProgress(newProgress);
-
-        if (newProgress >= 1) {
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (newProgress < 0.75) {
-          setShowContent(false);
-        }
-
-        setTouchStartY(touchY);
-      }
-    };
-
-    const handleTouchEnd = (): void => {
-      setTouchStartY(0);
-      // Snap on release so a normal flick commits instead of leaving the
-      // hero stranded mid-expansion (which blocks the page from scrolling).
-      // Momentum scrolling is suppressed while expanding, so without this a
-      // partial swipe locks the viewport at the hero on touch devices.
-      if (!mediaFullyExpanded) {
-        if (scrollProgress >= 0.2) {
-          setScrollProgress(1);
-          setMediaFullyExpanded(true);
-          setShowContent(true);
-        } else if (scrollProgress > 0) {
-          setScrollProgress(0);
-          setShowContent(false);
-        }
-      }
-    };
-
-    const handleScroll = (): void => {
-      if (!mediaFullyExpanded) {
-        window.scrollTo(0, 0);
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel as unknown as EventListener, {
-      passive: false,
-    });
-    window.addEventListener("scroll", handleScroll as EventListener);
-    window.addEventListener(
-      "touchstart",
-      handleTouchStart as unknown as EventListener,
-      { passive: false },
-    );
-    window.addEventListener(
-      "touchmove",
-      handleTouchMove as unknown as EventListener,
-      { passive: false },
-    );
-    window.addEventListener("touchend", handleTouchEnd as EventListener);
-
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      window.removeEventListener(
-        "wheel",
-        handleWheel as unknown as EventListener,
-      );
-      window.removeEventListener("scroll", handleScroll as EventListener);
-      window.removeEventListener(
-        "touchstart",
-        handleTouchStart as unknown as EventListener,
-      );
-      window.removeEventListener(
-        "touchmove",
-        handleTouchMove as unknown as EventListener,
-      );
-      window.removeEventListener("touchend", handleTouchEnd as EventListener);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
-  }, [scrollProgress, mediaFullyExpanded, touchStartY]);
+  }, [mediaType]);
 
   useEffect(() => {
     const checkIfMobile = (): void => {
@@ -186,12 +84,12 @@ const ScrollExpandMedia = ({
   const restOfTitle = title ? title.split(" ").slice(1).join(" ") : "";
 
   return (
-    <div
-      ref={sectionRef}
-      className="transition-colors duration-700 ease-in-out overflow-x-hidden"
-    >
-      <section className="relative flex flex-col items-center justify-start min-h-[100dvh]">
-        <div className="relative w-full flex flex-col items-center min-h-[100dvh]">
+    <div className="relative w-full">
+      {/* Scroll track: its height sets how far you scroll to fully expand.
+          No overflow-x-hidden here — it would force overflow-y:auto and break
+          the sticky pin. The sticky child clips the off-screen title instead. */}
+      <div ref={trackRef} className="relative w-full h-[200vh]">
+        <div className="sticky top-0 flex h-[100svh] w-full flex-col items-center justify-start overflow-hidden">
           <motion.div
             className="absolute inset-0 z-0 h-full"
             initial={{ opacity: 0 }}
@@ -214,7 +112,7 @@ const ScrollExpandMedia = ({
           </motion.div>
 
           <div className="container mx-auto flex flex-col items-center justify-start relative z-10">
-            <div className="flex flex-col items-center justify-center w-full h-[100dvh] relative">
+            <div className="flex flex-col items-center justify-center w-full h-[100svh] relative">
               <div
                 className="absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-2xl"
                 style={{
@@ -343,18 +241,20 @@ const ScrollExpandMedia = ({
                 </motion.h2>
               </div>
             </div>
-
-            <motion.section
-              className="flex flex-col w-full px-8 py-10 md:px-16 lg:py-20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: showContent ? 1 : 0 }}
-              transition={{ duration: 0.7 }}
-            >
-              {children}
-            </motion.section>
           </div>
         </div>
-      </section>
+      </div>
+
+      {children && (
+        <motion.section
+          className="flex flex-col w-full px-8 py-10 md:px-16 lg:py-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showContent ? 1 : 0 }}
+          transition={{ duration: 0.7 }}
+        >
+          {children}
+        </motion.section>
+      )}
     </div>
   );
 };
