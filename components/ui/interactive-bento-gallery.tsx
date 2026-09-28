@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Volume2, VolumeX } from "lucide-react";
 
 // Structure of a media item
 export interface MediaItemType {
@@ -12,6 +12,8 @@ export interface MediaItemType {
   desc: string;
   url: string;
   span: string;
+  /** Poster shown for a video while it is paused/buffering. */
+  poster?: string;
 }
 
 // Renders either a video (auto-plays in view) or an image
@@ -19,14 +21,35 @@ const MediaItem = ({
   item,
   className,
   onClick,
+  controls = false,
 }: {
   item: MediaItemType;
   className?: string;
   onClick?: () => void;
+  /** Show a mute/unmute toggle for videos (grid + modal, not the dock). */
+  controls?: boolean;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInView, setIsInView] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
+  // Keep the element's muted property in sync (React's `muted` attribute
+  // doesn't reliably update the live property).
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.muted = isMuted;
+  }, [isMuted]);
+
+  const toggleMute = () => {
+    const el = videoRef.current;
+    const next = !isMuted;
+    setIsMuted(next);
+    if (el) {
+      el.muted = next;
+      // Unmuting is a user gesture — make sure playback is running.
+      if (!next) el.play().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     const options = { root: null, rootMargin: "50px", threshold: 0.1 };
@@ -82,6 +105,7 @@ const MediaItem = ({
           muted
           loop
           preload="auto"
+          poster={item.poster}
           style={{
             opacity: isBuffering ? 0.8 : 1,
             transition: "opacity 0.2s",
@@ -95,6 +119,24 @@ const MediaItem = ({
           <div className="absolute inset-0 flex items-center justify-center bg-black/10">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white" />
           </div>
+        )}
+        {controls && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMute();
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="absolute right-2 top-2 z-20 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition hover:bg-black/70"
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </button>
         )}
       </div>
     );
@@ -162,6 +204,7 @@ const GalleryModal = ({
                   item={selectedItem}
                   className="aspect-[16/9] w-full bg-black/20 object-contain"
                   onClick={onClose}
+                  controls
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 md:p-4">
                   <h3 className="text-base font-medium text-white sm:text-lg md:text-xl">
@@ -360,6 +403,7 @@ const InteractiveBentoGallery: React.FC<InteractiveBentoGalleryProps> = ({
                   item={item}
                   className="absolute inset-0 h-full w-full"
                   onClick={() => !isDragging && setSelectedItem(item)}
+                  controls
                 />
                 <motion.div
                   className="absolute inset-0 flex flex-col justify-end p-3 md:p-4"

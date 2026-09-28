@@ -242,20 +242,29 @@ export interface Database {
       site_media: {
         Row: {
           slot: string;
-          url: string;
+          url: string | null;
           media_type: string;
+          poster_url: string | null;
+          title: string | null;
+          subtitle: string | null;
           updated_at: string;
         };
         Insert: {
           slot: string;
-          url: string;
+          url?: string | null;
           media_type?: string;
+          poster_url?: string | null;
+          title?: string | null;
+          subtitle?: string | null;
           updated_at?: string;
         };
         Update: {
           slot?: string;
-          url?: string;
+          url?: string | null;
           media_type?: string;
+          poster_url?: string | null;
+          title?: string | null;
+          subtitle?: string | null;
           updated_at?: string;
         };
         Relationships: [];

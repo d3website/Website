@@ -193,8 +193,11 @@ create policy "public read active arrivals" on new_arrivals
 -- ---------------------------------------------------------------------------
 create table if not exists site_media (
   slot text primary key,
-  url text not null,
+  url text,
   media_type text not null default 'image' check (media_type in ('image', 'video')),
+  poster_url text,
+  title text,
+  subtitle text,
   updated_at timestamptz default now()
 );
 

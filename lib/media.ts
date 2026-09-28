@@ -23,6 +23,12 @@ export interface MediaSlotDef {
   accept: MediaAccept;
   defaultUrl: string;
   defaultType?: MediaType;
+  /** Optional bundled poster for a default video. */
+  defaultPoster?: string;
+  /** Tiles that render a heading/subheading (the homepage gallery). */
+  editableText?: boolean;
+  defaultTitle?: string;
+  defaultSubtitle?: string;
 }
 
 export interface MediaGroupDef {
@@ -82,14 +88,56 @@ export const MEDIA_GROUPS: MediaGroupDef[] = [
         key: "home.gallery.1",
         label: "Tile 1 (large)",
         accept: "both",
-        defaultUrl: "/videos/hero-placeholder.mp4",
-        defaultType: "video",
+        defaultUrl: "/images/gallery/g1.jpg",
+        editableText: true,
+        defaultTitle: "Curtain Collections",
+        defaultSubtitle: "Jacquards, sheers and elegant drapes.",
       },
-      { key: "home.gallery.2", label: "Tile 2", accept: "both", defaultUrl: "/images/gallery/g2.jpg" },
-      { key: "home.gallery.3", label: "Tile 3", accept: "both", defaultUrl: "/images/gallery/g3.jpg" },
-      { key: "home.gallery.4", label: "Tile 4", accept: "both", defaultUrl: "/images/gallery/g4.jpg" },
-      { key: "home.gallery.5", label: "Tile 5", accept: "both", defaultUrl: "/images/gallery/g5.jpg" },
-      { key: "home.gallery.6", label: "Tile 6", accept: "both", defaultUrl: "/images/gallery/g6.jpg" },
+      {
+        key: "home.gallery.2",
+        label: "Tile 2",
+        accept: "both",
+        defaultUrl: "/images/gallery/g2.jpg",
+        editableText: true,
+        defaultTitle: "Upholstery",
+        defaultSubtitle: "Sofa and seating fabrics.",
+      },
+      {
+        key: "home.gallery.3",
+        label: "Tile 3",
+        accept: "both",
+        defaultUrl: "/images/gallery/g3.jpg",
+        editableText: true,
+        defaultTitle: "Outdoor Fabric",
+        defaultSubtitle: "Weather-ready textiles.",
+      },
+      {
+        key: "home.gallery.4",
+        label: "Tile 4",
+        accept: "both",
+        defaultUrl: "/images/gallery/g4.jpg",
+        editableText: true,
+        defaultTitle: "Textures",
+        defaultSubtitle: "Weaves that invite touch.",
+      },
+      {
+        key: "home.gallery.5",
+        label: "Tile 5",
+        accept: "both",
+        defaultUrl: "/images/gallery/g5.jpg",
+        editableText: true,
+        defaultTitle: "Living Spaces",
+        defaultSubtitle: "Fabrics for every room.",
+      },
+      {
+        key: "home.gallery.6",
+        label: "Tile 6",
+        accept: "both",
+        defaultUrl: "/images/gallery/g6.jpg",
+        editableText: true,
+        defaultTitle: "Colour Stories",
+        defaultSubtitle: "Palettes for your interior.",
+      },
     ],
   },
   {
@@ -150,16 +198,38 @@ export const MEDIA_SLOTS: Record<string, MediaSlotDef> = Object.fromEntries(
   MEDIA_GROUPS.flatMap((g) => g.slots).map((s) => [s.key, s]),
 );
 
-export type MediaMap = Record<string, { url: string; type: MediaType }>;
+export interface MediaOverride {
+  url?: string | null;
+  type: MediaType;
+  poster?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+}
+export type MediaMap = Record<string, MediaOverride>;
+
 export interface ResolvedMedia {
   url: string;
   type: MediaType;
+  poster?: string;
+  title?: string;
+  subtitle?: string;
 }
 
-/** Resolve a slot to its admin value, or the bundled default. */
+/**
+ * Resolve a slot to its admin value, or the bundled default. A slot row may
+ * override just the media, just the text/poster, or all of it — each field
+ * falls back independently.
+ */
 export function resolveMedia(map: MediaMap, key: string): ResolvedMedia {
   const def = MEDIA_SLOTS[key];
   const set = map[key];
-  if (set?.url) return { url: set.url, type: set.type };
-  return { url: def?.defaultUrl ?? "", type: def?.defaultType ?? "image" };
+
+  const hasMedia = Boolean(set?.url);
+  const url = hasMedia ? set!.url! : def?.defaultUrl ?? "";
+  const type = hasMedia ? set!.type : def?.defaultType ?? "image";
+  const poster = set?.poster || def?.defaultPoster || undefined;
+  const title = set?.title || def?.defaultTitle || undefined;
+  const subtitle = set?.subtitle || def?.defaultSubtitle || undefined;
+
+  return { url, type, poster, title, subtitle };
 }

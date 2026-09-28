@@ -4,29 +4,51 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { MediaMap, MediaType } from "@/lib/media";
 
-function toMap(
-  rows: { slot: string; url: string; media_type: string }[] | null,
-): MediaMap {
+type Row = {
+  slot: string;
+  url: string | null;
+  media_type: string;
+  poster_url?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+};
+
+// Full column set, and a legacy subset used as a fallback if the 0006
+// migration (poster_url/title/subtitle) hasn't been applied yet.
+const COLUMNS = "slot, url, media_type, poster_url, title, subtitle";
+const COLUMNS_LEGACY = "slot, url, media_type";
+
+function toMap(rows: Row[] | null): MediaMap {
   const map: MediaMap = {};
   for (const r of rows ?? []) {
-    map[r.slot] = { url: r.url, type: (r.media_type as MediaType) || "image" };
+    map[r.slot] = {
+      url: r.url,
+      type: (r.media_type as MediaType) || "image",
+      poster: r.poster_url ?? null,
+      title: r.title ?? null,
+      subtitle: r.subtitle ?? null,
+    };
   }
   return map;
 }
 
 /**
  * Public read of all managed media overrides. Resilient: returns {} if the
- * table doesn't exist yet (before the migration), so pages never break and
- * every placeholder falls back to its bundled default.
+ * table is missing, and falls back to the legacy columns if the poster/text
+ * migration hasn't run — so pages never break and placeholders fall back to
+ * their bundled defaults.
  */
 export async function getSiteMedia(): Promise<MediaMap> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("site_media")
-      .select("slot, url, media_type");
-    if (error) return {};
-    return toMap(data);
+    let { data, error } = await supabase.from("site_media").select(COLUMNS);
+    if (error) {
+      ({ data, error } = await supabase
+        .from("site_media")
+        .select(COLUMNS_LEGACY));
+      if (error) return {};
+    }
+    return toMap(data as Row[] | null);
   } catch {
     return {};
   }
@@ -36,13 +58,15 @@ export async function getSiteMedia(): Promise<MediaMap> {
 
 export async function listSiteMedia(): Promise<MediaMap> {
   const db = createAdminClient();
-  const { data, error } = await db
-    .from("site_media")
-    .select("slot, url, media_type");
-  if (error) throw new Error(error.message);
-  return toMap(data);
+  let { data, error } = await db.from("site_media").select(COLUMNS);
+  if (error) {
+    ({ data, error } = await db.from("site_media").select(COLUMNS_LEGACY));
+    if (error) throw new Error(error.message);
+  }
+  return toMap(data as Row[] | null);
 }
 
+/** Set (or replace) a slot's media. Leaves poster/title/subtitle untouched. */
 export async function setSiteMedia(
   slot: string,
   url: string,
@@ -53,6 +77,42 @@ export async function setSiteMedia(
     .from("site_media")
     .upsert(
       { slot, url, media_type, updated_at: new Date().toISOString() },
+      { onConflict: "slot" },
+    );
+  if (error) throw new Error(error.message);
+}
+
+/** Set a video slot's poster (thumbnail). Leaves the media/text untouched. */
+export async function setSiteMediaPoster(
+  slot: string,
+  poster_url: string,
+): Promise<void> {
+  const db = createAdminClient();
+  const { error } = await db
+    .from("site_media")
+    .upsert(
+      { slot, poster_url, updated_at: new Date().toISOString() },
+      { onConflict: "slot" },
+    );
+  if (error) throw new Error(error.message);
+}
+
+/** Set a tile's heading/subheading. Empty strings clear back to the default. */
+export async function setSiteMediaText(
+  slot: string,
+  title: string | null,
+  subtitle: string | null,
+): Promise<void> {
+  const db = createAdminClient();
+  const { error } = await db
+    .from("site_media")
+    .upsert(
+      {
+        slot,
+        title: title || null,
+        subtitle: subtitle || null,
+        updated_at: new Date().toISOString(),
+      },
       { onConflict: "slot" },
     );
   if (error) throw new Error(error.message);
