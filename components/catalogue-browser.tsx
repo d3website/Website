@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { slugify } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import { InteractiveCard } from "@/components/ui/interactive-card";
+import { FabricCard } from "@/components/ui/fabric-card";
 import type { PublicEntry } from "@/lib/data/public";
 
 /** Force the browser to download (not preview) the PDF via Supabase's
@@ -92,19 +92,17 @@ export function CatalogueBrowser({
           No collections to show here yet.
         </div>
       ) : (
-        <div
-          style={{ perspective: "1200px" }}
-          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {visible.map((e) => (
-            <InteractiveCard
+            <FabricCard
               key={e.id}
-              fill
+              imageUrl={e.thumbnail_url ?? ""}
               title={e.collection_name}
               subtitle={e.design_type?.name ?? e.section?.name ?? ""}
-              imageUrl={e.thumbnail_url}
-              actionText="Download Ebook"
-              actionHref={downloadHref(e.pdf_url, e.collection_name)}
+              href={downloadHref(e.pdf_url, e.collection_name)}
+              themeColor="30 26% 20%"
+              actionLabel="Download Ebook"
+              download
             />
           ))}
         </div>

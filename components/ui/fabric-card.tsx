@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,6 +15,10 @@ export interface FabricCardProps {
   href: string;
   /** HSL triple, e.g. "26 32% 19%" */
   themeColor: string;
+  /** Bottom action label (default "Explore"). */
+  actionLabel?: string;
+  /** Download action — uses a download icon and opens in a new tab. */
+  download?: boolean;
   className?: string;
 }
 
@@ -24,8 +28,11 @@ export function FabricCard({
   subtitle,
   href,
   themeColor,
+  actionLabel = "Explore",
+  download = false,
   className,
 }: FabricCardProps) {
+  const Icon = download ? Download : ArrowRight;
   return (
     <div
       style={{ "--theme-color": themeColor } as React.CSSProperties}
@@ -33,7 +40,10 @@ export function FabricCard({
     >
       <Link
         href={href}
-        aria-label={`Explore ${title}`}
+        aria-label={`${actionLabel} ${title}`}
+        {...(download
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : {})}
         className="relative block h-full w-full overflow-hidden rounded-xl shadow-md transition-all duration-500 ease-out group-hover:-translate-y-1"
         style={{
           boxShadow: `0 16px 40px -20px hsl(var(--theme-color) / 0.6)`,
@@ -60,9 +70,16 @@ export function FabricCard({
 
           <div className="mt-6 flex items-center justify-between rounded-md border border-white/25 bg-white/10 px-4 py-2.5 backdrop-blur-md transition-colors duration-300 group-hover:border-gold/60 group-hover:bg-gold/25">
             <span className="text-xs font-semibold uppercase tracking-widest">
-              Explore
+              {actionLabel}
             </span>
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            <Icon
+              className={cn(
+                "h-4 w-4 transition-transform duration-300",
+                download
+                  ? "group-hover:translate-y-0.5"
+                  : "group-hover:translate-x-1",
+              )}
+            />
           </div>
         </div>
       </Link>

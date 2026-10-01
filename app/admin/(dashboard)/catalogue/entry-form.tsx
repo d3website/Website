@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { InteractiveCard } from "@/components/ui/interactive-card";
+import { FabricCard } from "@/components/ui/fabric-card";
 import { saveEntry, type EntryFormState } from "../actions";
 import { TaxonomySelect } from "./taxonomy-select";
 import { uploadToStorage } from "@/lib/upload-client";
@@ -252,14 +252,15 @@ export function EntryForm({
         <p className="text-xs text-muted-foreground">
           How this card appears on the public catalogue page.
         </p>
-        <div className="max-w-[300px]" style={{ perspective: "1200px" }}>
-          <InteractiveCard
-            fill
+        <div className="max-w-[300px]">
+          <FabricCard
             title={collectionName || "Untitled collection"}
             subtitle=""
-            imageUrl={thumbPreview}
-            actionText="Download Ebook"
-            actionHref="#"
+            imageUrl={thumbPreview ?? ""}
+            href="#"
+            themeColor="30 26% 20%"
+            actionLabel="Download Ebook"
+            download
           />
         </div>
         {!publish && (
