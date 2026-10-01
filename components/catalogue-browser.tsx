@@ -4,8 +4,16 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { slugify } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import { CatalogueCard } from "@/components/catalogue-card";
+import { InteractiveCard } from "@/components/ui/interactive-card";
 import type { PublicEntry } from "@/lib/data/public";
+
+/** Force the browser to download (not preview) the PDF via Supabase's
+ * `?download` Content-Disposition, named after the collection. */
+function downloadHref(pdfUrl: string, collectionName: string): string {
+  const name = `${collectionName || "catalogue"}.pdf`;
+  const sep = pdfUrl.includes("?") ? "&" : "?";
+  return `${pdfUrl}${sep}download=${encodeURIComponent(name)}`;
+}
 
 type SectionTab = { id: string; name: string };
 
@@ -84,14 +92,19 @@ export function CatalogueBrowser({
           No collections to show here yet.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div
+          style={{ perspective: "1200px" }}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
           {visible.map((e) => (
-            <CatalogueCard
+            <InteractiveCard
               key={e.id}
-              thumbnailUrl={e.thumbnail_url}
-              collectionName={e.collection_name}
-              pdfUrl={e.pdf_url}
-              designType={e.design_type?.name ?? null}
+              fill
+              title={e.collection_name}
+              subtitle={e.design_type?.name ?? e.section?.name ?? ""}
+              imageUrl={e.thumbnail_url}
+              actionText="Download Ebook"
+              actionHref={downloadHref(e.pdf_url, e.collection_name)}
             />
           ))}
         </div>

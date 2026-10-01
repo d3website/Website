@@ -21,6 +21,8 @@ export interface InteractiveCardProps {
   actionNewTab?: boolean;
   /** top-right link (collection detail) — hidden when null */
   detailHref?: string | null;
+  /** fill the parent (responsive 3:4 portrait) instead of a fixed size */
+  fill?: boolean;
   className?: string;
 }
 
@@ -37,6 +39,7 @@ export function InteractiveCard({
   actionHref,
   actionNewTab = false,
   detailHref,
+  fill = false,
   className,
 }: InteractiveCardProps) {
   const mouseX = useMotionValue(0);
@@ -64,7 +67,8 @@ export function InteractiveCard({
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       className={cn(
-        "relative h-[26rem] w-80 rounded-2xl border border-border/30 bg-muted shadow-2xl",
+        "relative rounded-2xl border border-border/30 bg-muted shadow-2xl",
+        fill ? "aspect-[3/4] w-full" : "h-[26rem] w-80",
         className,
       )}
     >
