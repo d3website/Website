@@ -56,14 +56,14 @@ export async function saveEntry(
 
   const collection_name = String(formData.get("collection_name") ?? "").trim();
   const section_id = String(formData.get("section_id") ?? "").trim();
-  const design_type_id = String(formData.get("design_type_id") ?? "").trim();
+  const rawDesign = String(formData.get("design_type_id") ?? "").trim();
+  const design_type_id = rawDesign && rawDesign !== "none" ? rawDesign : null;
   const rawFeature = String(formData.get("feature_id") ?? "").trim();
   const feature_id = rawFeature && rawFeature !== "none" ? rawFeature : null;
   const is_active = String(formData.get("publish") ?? "true") === "true";
 
   if (!collection_name) return { error: "Collection name is required." };
   if (!section_id) return { error: "Section is required." };
-  if (!design_type_id) return { error: "Design type is required." };
 
   const thumbnail_url = String(formData.get("thumbnail_url") ?? "").trim();
   const pdf_url = String(formData.get("pdf_url") ?? "").trim();

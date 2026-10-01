@@ -20,7 +20,7 @@ type InitialEntry = {
   collection_name: string;
   section_id: string;
   feature_id: string | null;
-  design_type_id: string;
+  design_type_id: string | null;
   thumbnail_url: string;
   pdf_url: string;
   is_active: boolean;
@@ -77,10 +77,6 @@ export function EntryForm({
     if (hasPdf) {
       if ((pdf as File).type !== "application/pdf") {
         setClientError("Catalogue must be a PDF.");
-        return;
-      }
-      if ((pdf as File).size > 25 * 1024 * 1024) {
-        setClientError("PDF must be 25 MB or smaller.");
         return;
       }
     }
@@ -159,8 +155,8 @@ export function EntryForm({
             label="Design type"
             kind="design_type"
             items={designTypes}
-            defaultValue={initial?.design_type_id}
-            required
+            defaultValue={initial?.design_type_id ?? undefined}
+            includeNone
           />
         </div>
 
@@ -186,7 +182,8 @@ export function EntryForm({
             onChange={onThumbChange}
           />
           <p className="text-xs text-muted-foreground">
-            JPG/PNG/WebP, up to 5 MB.
+            JPG/PNG/WebP, up to 5 MB. Shown at 16:9 — a landscape image works
+            best.
             {isEdit && " Leave empty to keep the current image."}
           </p>
         </div>
@@ -208,7 +205,7 @@ export function EntryForm({
               ? `Selected: ${pdfName}`
               : isEdit
                 ? "Leave empty to keep the current PDF."
-                : "PDF, up to 25 MB."}
+                : "PDF."}
           </p>
         </div>
 

@@ -19,7 +19,7 @@ export function CatalogueCard({
 }) {
   const inner = (
     <div className="group overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md">
-      <div className="relative aspect-[4/3] w-full bg-muted">
+      <div className="relative aspect-video w-full bg-muted">
         {thumbnailUrl ? (
           <Image
             src={thumbnailUrl}

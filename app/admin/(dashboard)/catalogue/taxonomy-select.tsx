@@ -79,8 +79,15 @@ export function TaxonomySelect({
         {required && <span className="text-destructive"> *</span>}
       </Label>
       <div className="flex items-center gap-2">
-        <Select value={value} onValueChange={(v) => setValue(v ?? "")}>
-          <SelectTrigger id={name} className="flex-1">
+        <Select
+          items={{
+            ...(includeNone ? { [NONE]: "None" } : {}),
+            ...Object.fromEntries(items.map((i) => [i.id, i.name])),
+          }}
+          value={value}
+          onValueChange={(v) => setValue(v ?? "")}
+        >
+          <SelectTrigger id={name} className="min-w-0 flex-1">
             <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
           </SelectTrigger>
           <SelectContent>

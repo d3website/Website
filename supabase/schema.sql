@@ -30,7 +30,7 @@ create table if not exists catalogue_entries (
   collection_name text not null,
   section_id uuid references sections(id) not null,
   feature_id uuid references features(id),
-  design_type_id uuid references design_types(id) not null,
+  design_type_id uuid references design_types(id),
   thumbnail_url text not null,
   pdf_url text not null,
   is_active boolean default true,

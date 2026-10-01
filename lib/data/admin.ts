@@ -134,7 +134,7 @@ export type EntryInput = {
   collection_name: string;
   section_id: string;
   feature_id: string | null;
-  design_type_id: string;
+  design_type_id: string | null;
   thumbnail_url: string;
   pdf_url: string;
   is_active: boolean;
