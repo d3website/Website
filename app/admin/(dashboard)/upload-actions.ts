@@ -91,7 +91,8 @@ export async function createUpload(
         `attachment; filename="${downloadName.replace(/"/g, "")}"; ` +
         `filename*=UTF-8''${encodeURIComponent(downloadName)}`;
     }
-    const objectUrl = `${R2.endpoint!.replace(/\/$/, "")}/${bucket}/${key}`;
+    // R2 uses a single bucket (R2.bucket); the per-type name is the key prefix.
+    const objectUrl = `${R2.endpoint!.replace(/\/$/, "")}/${R2.bucket}/${key}`;
     const signed = await aws.sign(objectUrl, {
       method: "PUT",
       headers,
