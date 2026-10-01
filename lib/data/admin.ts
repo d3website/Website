@@ -1,6 +1,10 @@
 import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  deleteStoredFile,
+  deleteStoredFiles,
+} from "@/lib/data/storage-cleanup";
 import type {
   BlogPost,
   CatalogueEntry,
@@ -99,11 +103,18 @@ export async function updateSectionHeroImage(
   hero_image_url: string | null,
 ): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("sections")
+    .select("hero_image_url")
+    .eq("id", id)
+    .single();
   const { error } = await db
     .from("sections")
     .update({ hero_image_url })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  if (prev?.hero_image_url && prev.hero_image_url !== hero_image_url)
+    await deleteStoredFile(prev.hero_image_url);
 }
 
 export async function createFeature(name: string): Promise<Feature> {
@@ -156,6 +167,18 @@ export async function updateEntry(
   input: Partial<EntryInput>,
 ): Promise<CatalogueEntry> {
   const db = createAdminClient();
+  // Capture old media so a replaced thumbnail/PDF can be cleaned up.
+  const replacing =
+    input.thumbnail_url !== undefined || input.pdf_url !== undefined;
+  let prev: { thumbnail_url: string; pdf_url: string } | null = null;
+  if (replacing) {
+    const { data } = await db
+      .from("catalogue_entries")
+      .select("thumbnail_url, pdf_url")
+      .eq("id", id)
+      .single();
+    prev = data;
+  }
   const { data, error } = await db
     .from("catalogue_entries")
     .update(input)
@@ -163,13 +186,25 @@ export async function updateEntry(
     .select("*")
     .single();
   if (error) throw new Error(error.message);
+  if (input.thumbnail_url && prev && prev.thumbnail_url !== input.thumbnail_url)
+    await deleteStoredFile(prev.thumbnail_url);
+  if (input.pdf_url && prev && prev.pdf_url !== input.pdf_url)
+    await deleteStoredFile(prev.pdf_url);
   return data;
 }
 
 export async function deleteEntry(id: string): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("catalogue_entries")
+    .select("thumbnail_url, pdf_url")
+    .eq("id", id)
+    .single();
   const { error } = await db.from("catalogue_entries").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  // Runs after the cascade, so a thumbnail no longer used by any arrival is
+  // removed, while one still shared stays.
+  await deleteStoredFiles([prev?.thumbnail_url, prev?.pdf_url]);
 }
 
 // ---- Blog (admin) ---------------------------------------------------------
@@ -234,6 +269,15 @@ export async function updateBlogPost(
   input: Partial<BlogPostInput>,
 ): Promise<BlogPost> {
   const db = createAdminClient();
+  let prevCover: string | null = null;
+  if (input.cover_image_url !== undefined) {
+    const { data } = await db
+      .from("blog_posts")
+      .select("cover_image_url")
+      .eq("id", id)
+      .single();
+    prevCover = data?.cover_image_url ?? null;
+  }
   const { data, error } = await db
     .from("blog_posts")
     .update(input)
@@ -241,13 +285,21 @@ export async function updateBlogPost(
     .select("*")
     .single();
   if (error) throw new Error(error.message);
+  if (input.cover_image_url && prevCover && prevCover !== input.cover_image_url)
+    await deleteStoredFile(prevCover);
   return data;
 }
 
 export async function deleteBlogPost(id: string): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("blog_posts")
+    .select("cover_image_url")
+    .eq("id", id)
+    .single();
   const { error } = await db.from("blog_posts").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await deleteStoredFile(prev?.cover_image_url);
 }
 
 // ---- New Arrivals (admin) -------------------------------------------------
@@ -317,6 +369,15 @@ export async function updateNewArrival(
   input: Partial<NewArrivalInput>,
 ): Promise<NewArrival> {
   const db = createAdminClient();
+  let prevImg: string | null = null;
+  if (input.image_url !== undefined) {
+    const { data } = await db
+      .from("new_arrivals")
+      .select("image_url")
+      .eq("id", id)
+      .single();
+    prevImg = data?.image_url ?? null;
+  }
   const { data, error } = await db
     .from("new_arrivals")
     .update(input)
@@ -324,11 +385,21 @@ export async function updateNewArrival(
     .select("*")
     .single();
   if (error) throw new Error(error.message);
+  if (input.image_url && prevImg && prevImg !== input.image_url)
+    await deleteStoredFile(prevImg);
   return data;
 }
 
 export async function deleteNewArrival(id: string): Promise<void> {
   const db = createAdminClient();
+  // Only a manual arrival owns its image_url; a catalogue arrival stores null
+  // and shows the catalogue's thumbnail, so nothing is deleted here.
+  const { data: prev } = await db
+    .from("new_arrivals")
+    .select("image_url")
+    .eq("id", id)
+    .single();
   const { error } = await db.from("new_arrivals").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  await deleteStoredFile(prev?.image_url);
 }

@@ -2,6 +2,10 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import {
+  deleteStoredFile,
+  deleteStoredFiles,
+} from "@/lib/data/storage-cleanup";
 import type { MediaMap, MediaType } from "@/lib/media";
 
 type Row = {
@@ -73,6 +77,11 @@ export async function setSiteMedia(
   media_type: MediaType,
 ): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("site_media")
+    .select("url")
+    .eq("slot", slot)
+    .single();
   const { error } = await db
     .from("site_media")
     .upsert(
@@ -80,6 +89,7 @@ export async function setSiteMedia(
       { onConflict: "slot" },
     );
   if (error) throw new Error(error.message);
+  if (prev?.url && prev.url !== url) await deleteStoredFile(prev.url);
 }
 
 /** Set a video slot's poster (thumbnail). Leaves the media/text untouched. */
@@ -88,6 +98,11 @@ export async function setSiteMediaPoster(
   poster_url: string,
 ): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("site_media")
+    .select("poster_url")
+    .eq("slot", slot)
+    .single();
   const { error } = await db
     .from("site_media")
     .upsert(
@@ -95,6 +110,8 @@ export async function setSiteMediaPoster(
       { onConflict: "slot" },
     );
   if (error) throw new Error(error.message);
+  if (prev?.poster_url && prev.poster_url !== poster_url)
+    await deleteStoredFile(prev.poster_url);
 }
 
 /** Set a tile's heading/subheading. Empty strings clear back to the default. */
@@ -120,6 +137,12 @@ export async function setSiteMediaText(
 
 export async function deleteSiteMedia(slot: string): Promise<void> {
   const db = createAdminClient();
+  const { data: prev } = await db
+    .from("site_media")
+    .select("url, poster_url")
+    .eq("slot", slot)
+    .single();
   const { error } = await db.from("site_media").delete().eq("slot", slot);
   if (error) throw new Error(error.message);
+  await deleteStoredFiles([prev?.url, prev?.poster_url]);
 }
