@@ -77,7 +77,7 @@ export default async function HomePage() {
       </section>
 
       {/* Product teasers — fabric category cards */}
-      <section className="mx-auto w-full max-w-6xl px-6 pb-20">
+      <section className="mx-auto w-full max-w-6xl px-6 py-20">
         <div className="mb-10 text-center">
           <p className="eyebrow">Explore</p>
           <h2 className="mt-4 text-3xl font-medium sm:text-4xl">Our Fabrics</h2>
