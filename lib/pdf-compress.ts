@@ -37,6 +37,29 @@ export type CompressBytesResult = {
   changed: boolean;
 };
 
+/**
+ * Number of colour components in a JPEG (3 = RGB/YCbCr, 4 = CMYK/YCCK,
+ * 1 = grayscale), read from its SOF marker. Returns null if not found.
+ */
+function jpegComponents(jpeg: Uint8Array): number | null {
+  let i = 2;
+  while (i < jpeg.length - 1) {
+    if (jpeg[i] !== 0xff) {
+      i++;
+      continue;
+    }
+    const marker = jpeg[i + 1];
+    // SOF markers (baseline/progressive/etc.), excluding non-SOF C4/C8/CC.
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return jpeg[i + 9] ?? null;
+    }
+    const len = (jpeg[i + 2] << 8) | jpeg[i + 3];
+    if (len <= 0) break;
+    i += 2 + len;
+  }
+  return null;
+}
+
 async function reencodeJpeg(
   jpeg: Uint8Array,
   quality: number,
@@ -115,7 +138,9 @@ export async function compressPdfBytes(
           continue;
         }
       }
-      if (jpeg[0] === 0xff && jpeg[1] === 0xd8) {
+      // Only touch 3-component RGB JPEGs. CMYK (4) and grayscale (1) decode
+      // unreliably through canvas and would shift colours — leave them as-is.
+      if (jpeg[0] === 0xff && jpeg[1] === 0xd8 && jpegComponents(jpeg) === 3) {
         const out = await reencodeJpeg(jpeg, quality, maxEdge);
         if (out && out.bytes.length < jpeg.length) {
           const newDict = obj.dict.clone();

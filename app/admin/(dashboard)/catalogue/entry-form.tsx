@@ -52,6 +52,7 @@ export function EntryForm({
   const [pdfName, setPdfName] = useState<string | null>(null);
   const [publish, setPublish] = useState<boolean>(initial?.is_active ?? true);
   const [uploading, setUploading] = useState(false);
+  const [compress, setCompress] = useState(false);
   const [compressPct, setCompressPct] = useState<number | null>(null);
   const [savings, setSavings] = useState<string | null>(null);
   const [clientError, setClientError] = useState<string | null>(null);
@@ -90,7 +91,7 @@ export function EntryForm({
       // catalogues take far less storage + bandwidth. Non-blocking + safe:
       // on any issue it returns the original unchanged.
       let pdfFile = pdf as File;
-      if (hasPdf) {
+      if (hasPdf && compress) {
         setCompressPct(0);
         const res = await compressPdfInWorker(pdfFile, (f) =>
           setCompressPct(Math.round(f * 100)),
@@ -236,6 +237,23 @@ export function EntryForm({
               : isEdit
                 ? "Leave empty to keep the current PDF."
                 : "PDF."}
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={compress}
+              onChange={(e) => setCompress(e.target.checked)}
+              className="size-4 rounded border-input"
+            />
+            Compress PDF before upload
+          </label>
+          <p className="pl-6 text-xs text-muted-foreground">
+            Off by default — the file uploads as-is. Compression shrinks large
+            photo PDFs but can slightly affect colour; CMYK images are left
+            untouched.
           </p>
         </div>
 
