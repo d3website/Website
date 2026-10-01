@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { listEntries } from "@/lib/data/admin";
+import { listEntriesPage } from "@/lib/data/admin";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,8 +13,19 @@ import {
 } from "@/components/ui/table";
 import { EntryRowActions } from "./entry-row-actions";
 
-export default async function DashboardPage() {
-  const entries = await listEntries();
+const PAGE_SIZE = 20;
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
+  const { entries, total } = await listEntriesPage(page, PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const start = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, total);
 
   return (
     <div className="flex flex-col gap-6">
@@ -22,7 +33,8 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-xl font-semibold">Catalogue entries</h1>
           <p className="text-sm text-muted-foreground">
-            {entries.length} {entries.length === 1 ? "entry" : "entries"}
+            {total} {total === 1 ? "entry" : "entries"}
+            {total > PAGE_SIZE && ` · showing ${start}–${end}`}
           </p>
         </div>
         <Button nativeButton={false} render={<Link href="/admin/catalogue/new" />}>
@@ -39,6 +51,7 @@ export default async function DashboardPage() {
           .
         </div>
       ) : (
+        <>
         <div className="rounded-lg border">
           <Table>
             <TableHeader>
@@ -91,6 +104,45 @@ export default async function DashboardPage() {
             </TableBody>
           </Table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </p>
+            <div className="flex gap-2">
+              {page > 1 ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href={`/admin?page=${page - 1}`} />}
+                >
+                  Previous
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" disabled>
+                  Previous
+                </Button>
+              )}
+              {page < totalPages ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href={`/admin?page=${page + 1}`} />}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" disabled>
+                  Next
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+        </>
       )}
     </div>
   );

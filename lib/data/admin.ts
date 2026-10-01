@@ -74,6 +74,25 @@ export async function listEntries(): Promise<EntryWithRelations[]> {
   return (data ?? []) as unknown as EntryWithRelations[];
 }
 
+/** One page of catalogue entries (newest first) plus the total count. */
+export async function listEntriesPage(
+  page: number,
+  pageSize: number,
+): Promise<{ entries: EntryWithRelations[]; total: number }> {
+  const db = createAdminClient();
+  const from = (page - 1) * pageSize;
+  const { data, error, count } = await db
+    .from("catalogue_entries")
+    .select(ENTRY_SELECT, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, from + pageSize - 1);
+  if (error) throw new Error(`Failed to load entries: ${error.message}`);
+  return {
+    entries: (data ?? []) as unknown as EntryWithRelations[],
+    total: count ?? 0,
+  };
+}
+
 export async function getEntry(id: string): Promise<EntryWithRelations | null> {
   const db = createAdminClient();
   const { data, error } = await db
