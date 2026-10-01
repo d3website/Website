@@ -23,10 +23,15 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      // Supabase Storage public URLs (catalogue thumbnails, blog covers).
+      // Supabase Storage public URLs (legacy — pre-R2 uploads).
       {
         protocol: "https",
         hostname: "**.supabase.co",
+      },
+      // Cloudflare R2 public URLs (current storage).
+      {
+        protocol: "https",
+        hostname: "**.r2.dev",
       },
     ],
   },
