@@ -9,6 +9,7 @@ import { FabricCard } from "@/components/ui/fabric-card";
 import { saveEntry, type EntryFormState } from "../actions";
 import { TaxonomySelect } from "./taxonomy-select";
 import { uploadToStorage } from "@/lib/upload-client";
+import { compressPdfInWorker } from "@/lib/pdf-compress-client";
 import type {
   DesignType,
   Feature,
@@ -51,6 +52,8 @@ export function EntryForm({
   const [pdfName, setPdfName] = useState<string | null>(null);
   const [publish, setPublish] = useState<boolean>(initial?.is_active ?? true);
   const [uploading, setUploading] = useState(false);
+  const [compressPct, setCompressPct] = useState<number | null>(null);
+  const [savings, setSavings] = useState<string | null>(null);
   const [clientError, setClientError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -81,8 +84,29 @@ export function EntryForm({
       }
     }
 
-    setUploading(true);
+    setSavings(null);
     try {
+      // Compress the PDF (image downsampling) in a worker before uploading, so
+      // catalogues take far less storage + bandwidth. Non-blocking + safe:
+      // on any issue it returns the original unchanged.
+      let pdfFile = pdf as File;
+      if (hasPdf) {
+        setCompressPct(0);
+        const res = await compressPdfInWorker(pdfFile, (f) =>
+          setCompressPct(Math.round(f * 100)),
+        );
+        setCompressPct(null);
+        pdfFile = res.file;
+        if (res.changed) {
+          setSavings(
+            `Compressed ${(res.originalBytes / 1048576).toFixed(1)} MB → ${(
+              res.compressedBytes / 1048576
+            ).toFixed(1)} MB`,
+          );
+        }
+      }
+
+      setUploading(true);
       if (hasThumb) {
         fd.set(
           "thumbnail_url",
@@ -90,10 +114,16 @@ export function EntryForm({
         );
       }
       if (hasPdf) {
-        fd.set("pdf_url", await uploadToStorage("catalogues", name, pdf as File));
+        fd.set(
+          "pdf_url",
+          await uploadToStorage("catalogues", name, pdfFile, {
+            downloadName: `${name}.pdf`,
+          }),
+        );
       }
     } catch (err) {
       setClientError(err instanceof Error ? err.message : "Upload failed.");
+      setCompressPct(null);
       setUploading(false);
       return;
     }
@@ -226,15 +256,29 @@ export function EntryForm({
           </p>
         )}
 
+        {compressPct !== null && (
+          <p className="text-xs text-muted-foreground" role="status">
+            Compressing PDF… {compressPct}%
+          </p>
+        )}
+        {savings && (
+          <p className="text-xs text-muted-foreground">{savings}</p>
+        )}
+
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={pending || uploading}>
-            {uploading
-              ? "Uploading…"
-              : pending
-                ? "Saving…"
-                : isEdit
-                  ? "Save changes"
-                  : "Save entry"}
+          <Button
+            type="submit"
+            disabled={pending || uploading || compressPct !== null}
+          >
+            {compressPct !== null
+              ? `Compressing… ${compressPct}%`
+              : uploading
+                ? "Uploading…"
+                : pending
+                  ? "Saving…"
+                  : isEdit
+                    ? "Save changes"
+                    : "Save entry"}
           </Button>
           <Button
             variant="ghost"
