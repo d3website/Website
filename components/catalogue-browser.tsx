@@ -4,8 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { slugify } from "@/lib/slug";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { FabricCard } from "@/components/ui/fabric-card";
 import type { PublicEntry } from "@/lib/data/public";
+
+/** How many cards to render per batch before "Load more". */
+const BATCH = 24;
 
 /** Force the browser to download (not preview) the PDF via Supabase's
  * `?download` Content-Disposition, named after the collection. */
@@ -51,6 +55,17 @@ export function CatalogueBrowser({
     [entries, designType],
   );
 
+  // Progressive rendering: show a batch at a time, with "Load more". Reset
+  // during render when the filter changes (React's state-reset pattern) so you
+  // start from the top of the newly filtered list.
+  const [shown, setShown] = useState(BATCH);
+  const [prevType, setPrevType] = useState(designType);
+  if (prevType !== designType) {
+    setPrevType(designType);
+    setShown(BATCH);
+  }
+  const shownEntries = visible.slice(0, shown);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Section tabs */}
@@ -92,20 +107,37 @@ export function CatalogueBrowser({
           No collections to show here yet.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visible.map((e) => (
-            <FabricCard
-              key={e.id}
-              imageUrl={e.thumbnail_url ?? ""}
-              title={e.collection_name}
-              subtitle={e.design_type?.name ?? e.section?.name ?? ""}
-              href={downloadHref(e.pdf_url, e.collection_name)}
-              themeColor="30 26% 20%"
-              actionLabel="Download Ebook"
-              download
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {shownEntries.map((e) => (
+              <FabricCard
+                key={e.id}
+                imageUrl={e.thumbnail_url ?? ""}
+                title={e.collection_name}
+                subtitle={e.design_type?.name ?? e.section?.name ?? ""}
+                href={downloadHref(e.pdf_url, e.collection_name)}
+                themeColor="30 26% 20%"
+                actionLabel="Download Ebook"
+                download
+              />
+            ))}
+          </div>
+
+          {shown < visible.length && (
+            <div className="mt-4 flex flex-col items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShown((s) => s + BATCH)}
+              >
+                Load more
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Showing {shownEntries.length} of {visible.length}
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
