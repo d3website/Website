@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, ReactNode } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 interface ScrollExpandMediaProps {
   mediaType?: "video" | "image";
@@ -12,6 +14,9 @@ interface ScrollExpandMediaProps {
   title?: string;
   date?: string;
   scrollToExpand?: string;
+  /** Above-the-fold call-to-action button. */
+  ctaText?: string;
+  ctaHref?: string;
   textBlend?: boolean;
   children?: ReactNode;
 }
@@ -24,6 +29,8 @@ const ScrollExpandMedia = ({
   title,
   date,
   scrollToExpand,
+  ctaText,
+  ctaHref,
   textBlend,
   children,
 }: ScrollExpandMediaProps) => {
@@ -239,6 +246,24 @@ const ScrollExpandMedia = ({
                 >
                   {restOfTitle}
                 </motion.h2>
+
+                {ctaText && ctaHref && (
+                  <motion.div
+                    className="relative z-10 mt-2"
+                    style={{
+                      opacity: Math.max(0, 1 - scrollProgress * 2.5),
+                      pointerEvents: scrollProgress > 0.2 ? "none" : "auto",
+                    }}
+                  >
+                    <Link
+                      href={ctaHref}
+                      className="inline-flex items-center gap-2 rounded-lg bg-gold px-6 py-3 text-sm font-semibold tracking-wide text-gold-foreground shadow-lg transition-colors hover:bg-gold/90"
+                    >
+                      {ctaText}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </motion.div>
+                )}
               </div>
             </div>
           </div>

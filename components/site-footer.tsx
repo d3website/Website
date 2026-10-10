@@ -93,9 +93,15 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <p className="mx-auto max-w-6xl px-6 py-4 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {company.legalName}. All rights reserved.
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-6 py-4 text-xs text-muted-foreground">
+          <p>
+            © {new Date().getFullYear()} {company.legalName}. All rights
+            reserved.
+          </p>
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </footer>
   );

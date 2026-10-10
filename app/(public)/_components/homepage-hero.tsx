@@ -25,6 +25,8 @@ export default function HomepageHero({
       bgImageSrc={background}
       title="Spaces Redefined"
       scrollToExpand="Explore curated fabrics"
+      ctaText="Browse Collections"
+      ctaHref="/catalogue"
     />
   );
 }
